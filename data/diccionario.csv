@@ -1,0 +1,6 @@
+id,expresion,variantes,region,significados_posibles,dimension_probable,ambiguedad,requiere_aclaracion,pregunta_aclaratoria,validacion
+EXP001,no doy abasto,no alcanzo|no me da el tiempo,Colombia,sobrecarga|presion temporal,carga laboral,media,si,¿Esto ocurre ocasionalmente o se ha vuelto frecuente?,pendiente
+EXP002,me la tiene montada,me tiene entre ojos|me tiene fichado,Colombia,conflicto|trato diferencial|percepcion de hostigamiento,relaciones y liderazgo,alta,si,¿Qué comportamientos concretos te hacen sentir de esa manera?,pendiente
+EXP003,no me paran bolas,no me escuchan|no me prestan atencion,Colombia,falta de escucha|falta de apoyo,apoyo social y liderazgo,media,si,¿Has solicitado ayuda y qué respuesta has recibido?,pendiente
+EXP004,todo es para ayer,,Colombia,presion temporal,carga laboral,media,si,¿Con qué frecuencia tienes que atender tareas urgentes o con plazos muy cortos?,pendiente
+EXP005,estoy mamado,ya me mame,Colombia,cansancio|frustracion|rechazo,requiere aclaracion,alta,si,Cuando dices que estás mamado ¿se relaciona con la cantidad de trabajo el trato los horarios u otra situación?,pendiente
