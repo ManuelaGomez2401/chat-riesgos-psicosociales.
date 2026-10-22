@@ -1,1 +1,1 @@
-"""Lógica del MVP Escucha Laboral."""
+"""Módulos de Escucha Laboral V3."""

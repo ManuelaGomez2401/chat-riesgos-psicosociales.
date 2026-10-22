@@ -1,51 +1,34 @@
-# Escucha Laboral - Versión 2
+# Escucha Laboral V3
 
-MVP universitario conversacional para la identificación preventiva de señales asociadas con factores de riesgo psicosocial en entornos laborales colombianos.
+MVP universitario para validación de un chat preventivo sobre factores de riesgo psicosocial.
 
-## Novedades de la versión 2
-- Historial de conversación con `st.session_state`.
-- Interfaz de chat con `st.chat_message` y `st.chat_input`.
-- Pregunta aclaratoria.
-- Frecuencia, duración e impacto.
-- Orientación preventiva experimental.
-- Botón para reiniciar.
-- Código separado en módulos.
+## Funciones
+- Coincidencia exacta y aproximada con RapidFuzz.
+- Varias dimensiones en un mensaje.
+- Negación básica.
+- Conversación multietapa.
+- Retroalimentación final.
+- Panel académico agregado.
+- Administrador de expresiones en modo borrador.
+- Supabase opcional. Sin credenciales funciona en modo demostración.
 
-## Ejecutar localmente
-
-```bash
-python -m venv .venv
-```
-
-Windows:
-
-```bash
-.venv\Scripts\activate
-```
-
-macOS/Linux:
-
-```bash
-source .venv/bin/activate
-```
-
-Instalar y ejecutar:
-
+## Ejecutar
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## Ejecutar pruebas
-
+## Probar
 ```bash
 pytest
 ```
 
-## Publicar en Streamlit Community Cloud
-- Repositorio: el repositorio de GitHub donde se suban estos archivos.
-- Rama: `main`.
-- Archivo principal: `app.py`.
+## Supabase opcional
+1. Crear un proyecto en Supabase.
+2. Ejecutar `supabase/schema.sql` en SQL Editor.
+3. Copiar `.streamlit/secrets.toml.example` como `.streamlit/secrets.toml`.
+4. Completar URL y anon key.
+5. Nunca subir `secrets.toml` a GitHub.
 
-## Advertencia
-Este prototipo no diagnostica, no reemplaza la Batería de Riesgo Psicosocial y debe probarse inicialmente con datos ficticios o anonimizados.
+## Streamlit Community Cloud
+Rama: `main`. Archivo principal: `app.py`. Configurar secretos desde Advanced settings si se activa Supabase.
