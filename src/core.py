@@ -7,12 +7,12 @@ def detectar(t,df):
  n=norm(t);out=[]
  for _,r in df.iterrows():
   vals=[r.expresion]+str(r.variantes).split('|');score=max(100 if norm(v) in n else partial_ratio(norm(v),n) for v in vals)
-  if score>=78:out.append((r.dimension,score,'diccionario'))
+  if score>=78:out.append((r.dimension,score))
  for d,ks in CATS.items():
-  if any(norm(k) in n for k in ks):out.append((d,90,'categoria'))
+  if any(norm(k) in n for k in ks):out.append((d,90))
  seen=set();ans=[]
- for d,s,f in sorted(out,key=lambda z:z[1],reverse=True):
-  if d not in seen:ans.append({'dimension':d,'confianza':round(s/100,2),'fuente':f});seen.add(d)
+ for d,s in sorted(out,key=lambda z:z[1],reverse=True):
+  if d not in seen:ans.append(d);seen.add(d)
  return ans[:3]
 def relacion(t):
  t=norm(t)

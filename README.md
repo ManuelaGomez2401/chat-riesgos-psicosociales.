@@ -1,18 +1,13 @@
-# Escucha Laboral V4
+# Escucha Laboral V4.1
 
-Aplicación única con avatar de perrito blanco y negro, animación CSS, diseño salvia, Gemini opcional y almacenamiento opcional en Supabase.
+Corrección crítica: cada mensaje se analiza primero con un detector local de situaciones prioritarias, sin importar la etapa de conversación y sin depender de Gemini.
 
-## Modo demostración
-Funciona sin claves. No guarda chats ni llama a Gemini.
+## Avatares
+- Asistente: perrito blanco y negro.
+- Persona usuaria: avatar humano genérico.
 
-## Activar Gemini
-Agrega `GEMINI_API_KEY` en Streamlit Secrets. La IA solo se consulta cuando las reglas no comprenden y la persona autoriza ese uso.
-
-## Activar guardado
-1. Crea un proyecto Supabase.
-2. Ejecuta `supabase/schema.sql`.
-3. Agrega `SUPABASE_URL` y `SUPABASE_KEY` en Streamlit Secrets.
-4. El guardado solo ocurre cuando la persona autoriza guardar la conversación.
-
-## GitHub
-Elimina cualquier carpeta antigua `pages/`. Sube el contenido interno de esta carpeta. Archivo principal: `app.py`.
+## Importante
+- Elimina cualquier carpeta `pages/` antigua.
+- Sube el contenido interno de esta carpeta a la raíz de GitHub.
+- Archivo principal: `app.py`.
+- Revisa y valida el protocolo prioritario con profesionales antes de usarlo con personas reales.
