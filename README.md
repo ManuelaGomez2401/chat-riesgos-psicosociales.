@@ -1,14 +1,8 @@
-# Escucha Laboral V3.1
-Versión con conversación completamente escrita, exploración neutral de relación laboral y diseño visual renovado.
+# Escucha Laboral V3.2
 
-## Ejecutar
-```bash
-pip install -r requirements.txt
-streamlit run app.py
-```
+Aplicación única, sin páginas duplicadas. Incluye conversación escrita, detección por diccionario y categorías, acumulación de dimensiones, recuperación ante respuestas no comprendidas y cierre sin clasificación.
 
-## Cambios
-- La persona escribe frecuencia, duración e impacto.
-- El sistema primero confirma si la situación se relaciona con el trabajo.
-- Puede concluir sin relación laboral o con información insuficiente.
-- Interfaz con encabezado, colores, tarjetas y chat visual.
+## Publicación
+Sube **el contenido interno** de esta carpeta a la raíz del repositorio. Elimina cualquier carpeta `pages/` antigua del repositorio para evitar que Streamlit muestre una segunda ventana de chat.
+
+Archivo principal en Streamlit: `app.py`.
