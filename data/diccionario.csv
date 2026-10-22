@@ -1,13 +1,8 @@
-id,expresion,variantes,categoria,dimension_probable,ambiguedad,requiere_aclaracion,pregunta_aclaratoria,region,estado_validacion
-EXP001,no doy abasto,no alcanzo|no me da el tiempo|estoy hasta el cuello,carga,carga laboral,media,si,¿Esto ocurre ocasionalmente o se ha vuelto frecuente?,Colombia,pendiente
-EXP002,todo es para ayer,todo es urgente|todo lo quieren ya,carga,carga laboral,media,si,¿Con qué frecuencia tienes que atender tareas urgentes o con plazos muy cortos?,Colombia,pendiente
-EXP003,me la tiene montada,me tiene entre ojos|me tiene fichado,relaciones,relaciones y liderazgo,alta,si,¿Qué comportamientos concretos te hacen sentir de esa manera?,Colombia,pendiente
-EXP004,no me paran bolas,no me escuchan|no me prestan atención,liderazgo,apoyo social y liderazgo,media,si,¿Has solicitado ayuda y qué respuesta has recibido?,Colombia,pendiente
-EXP005,estoy mamado,ya me mamé|estoy aburrido,ambigua,situación laboral por aclarar,alta,si,Cuando dices que estás mamado ¿se relaciona con la cantidad de trabajo el trato los horarios u otra situación?,Colombia,pendiente
-EXP006,no puedo desconectarme,vivo pegado al celular|me escriben a cualquier hora,jornada,jornada y desconexión,media,si,¿El trabajo continúa ocupando tiempo después de terminar tu jornada?,Colombia,pendiente
-EXP007,nadie valora lo que hago,nunca reconocen mi trabajo|da lo mismo esforzarse,reconocimiento,reconocimiento laboral,media,si,¿Qué situaciones te han hecho sentir que tu trabajo no es reconocido?,Colombia,pendiente
-EXP008,no puedo decidir nada,todo lo tengo que consultar|no tengo voz ni voto,autonomia,autonomía y control,media,si,¿En cuáles decisiones relacionadas con tu trabajo te gustaría tener mayor participación?,Colombia,pendiente
-EXP009,siento que me van a sacar,estoy en la cuerda floja|no sé si me van a renovar,seguridad,seguridad laboral,alta,si,¿Qué cambios o situaciones han aumentado esa sensación de incertidumbre?,Colombia,pendiente
-EXP010,el ambiente está pesado,hay mucha tensión|el ambiente está raro,relaciones,relaciones laborales,alta,si,¿Qué situaciones concretas hacen que percibas el ambiente de esa manera?,Colombia,pendiente
-EXP011,me toca apagar incendios,todo el día resolviendo urgencias,carga,carga laboral,media,si,¿Las urgencias forman parte habitual de tu trabajo o corresponden a una situación puntual?,Colombia,pendiente
-EXP012,no sé qué esperan de mí,no tengo claras mis funciones|me cambian las funciones,rol,claridad del rol,media,si,¿Qué responsabilidades o expectativas consideras que no están claras?,Colombia,pendiente
+id,expresion,variantes,dimension_probable,pregunta_aclaratoria
+1,no doy abasto,no doi abasto|no alcanzo|no me da el tiempo,carga laboral,¿Qué tareas o plazos están generando mayor presión?
+2,todo es para ayer,todo es urgente|todo lo quieren ya,carga laboral,¿Con qué frecuencia tienes que atender tareas urgentes?
+3,no me paran bolas,no me escuchan|no me prestan atención,apoyo social y liderazgo,¿Qué apoyo solicitaste y qué respuesta recibiste?
+4,me la tiene montada,me tiene entre ojos|me tiene fichado,relaciones y liderazgo,¿Qué comportamientos concretos te hacen sentir de esa manera?
+5,no puedo desconectarme,vivo pegado al celular|me escriben a cualquier hora,jornada y desconexión,¿El trabajo continúa ocupando tiempo después de terminar tu jornada?
+6,nadie valora lo que hago,nunca reconocen mi trabajo|solo ven mis errores,reconocimiento laboral,¿Qué situaciones te han hecho sentir que tu trabajo no es reconocido?
+7,no sé qué esperan de mí,no tengo claras mis funciones|me cambian las funciones,claridad del rol,¿Qué responsabilidades o expectativas no están claras?

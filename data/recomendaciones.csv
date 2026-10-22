@@ -1,16 +1,7 @@
-dimension,nivel_orientativo,mensaje_usuario
-general,Orientación general,La situación parece puntual con la información disponible. Observa si vuelve a presentarse y registra qué condiciones la generan.
-general,Seguimiento preventivo,La situación muestra recurrencia o impacto. Registra cuándo ocurre y revisa los apoyos disponibles.
-general,Contacto humano recomendado,La frecuencia duración o impacto sugieren buscar orientación humana mediante un canal autorizado de SST bienestar o apoyo profesional.
-carga laboral,Orientación general,Observa si la presión corresponde a un momento puntual y registra qué tareas o plazos la producen.
-carga laboral,Seguimiento preventivo,Puede ser útil organizar tareas plazos e interrupciones y conversar sobre prioridades o distribución de carga con un canal autorizado.
-carga laboral,Contacto humano recomendado,La recurrencia y el impacto justifican solicitar una revisión humana de carga plazos jornada y apoyos disponibles.
-relaciones y liderazgo,Orientación general,Registra el hecho concreto y diferencia una situación puntual de un patrón repetido.
-relaciones y liderazgo,Seguimiento preventivo,Documenta conductas observables frecuencia y contexto y considera utilizar un canal de orientación autorizado.
-relaciones y liderazgo,Contacto humano recomendado,La situación merece revisión humana. El sistema no confirma acoso; utiliza canales institucionales autorizados.
-apoyo social y liderazgo,Orientación general,Identifica qué apoyo necesitabas y qué respuesta recibiste.
-apoyo social y liderazgo,Seguimiento preventivo,Puede ser conveniente solicitar claridad sobre canales de apoyo responsabilidades y tiempos de respuesta.
-apoyo social y liderazgo,Contacto humano recomendado,Busca acompañamiento humano para revisar la falta de apoyo y su impacto sostenido.
-jornada y desconexión,Orientación general,Observa si la extensión de jornada fue excepcional y registra cuándo ocurre.
-jornada y desconexión,Seguimiento preventivo,Revisa horarios mensajes fuera de jornada pausas y posibilidades de desconexión con un canal autorizado.
-jornada y desconexión,Contacto humano recomendado,La afectación sostenida del descanso o la vida personal amerita orientación humana y revisión de jornada y desconexión.
+dimension,nivel,mensaje
+carga laboral,Situación laboral puntual,Observa si la presión vuelve a presentarse y registra tareas plazos e interrupciones.
+carga laboral,Posible factor psicosocial recurrente,Conviene revisar prioridades distribución de carga plazos y apoyos disponibles.
+carga laboral,Revisión humana recomendada,La recurrencia y el impacto justifican solicitar una revisión humana de carga jornada y apoyos.
+general,Situación laboral puntual,La situación parece puntual con la información disponible. Observa su evolución.
+general,Posible factor psicosocial recurrente,La situación presenta recurrencia o impacto y conviene revisar apoyos y condiciones laborales.
+general,Revisión humana recomendada,La frecuencia duración o impacto sugieren solicitar revisión humana mediante un canal autorizado.
