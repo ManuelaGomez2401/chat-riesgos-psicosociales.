@@ -1,13 +1,15 @@
-# Escucha Laboral V4.1
+# Escucha Laboral V4.2
 
-Corrección crítica: cada mensaje se analiza primero con un detector local de situaciones prioritarias, sin importar la etapa de conversación y sin depender de Gemini.
+Restablece las autorizaciones separadas, Gemini opcional y guardado opcional en Supabase, conservando el protocolo prioritario y los avatares de perrito y persona.
 
-## Avatares
-- Asistente: perrito blanco y negro.
-- Persona usuaria: avatar humano genérico.
+## Secrets
+```toml
+GEMINI_API_KEY="..."
+SUPABASE_URL="..."
+SUPABASE_KEY="..."
+```
 
-## Importante
-- Elimina cualquier carpeta `pages/` antigua.
-- Sube el contenido interno de esta carpeta a la raíz de GitHub.
-- Archivo principal: `app.py`.
-- Revisa y valida el protocolo prioritario con profesionales antes de usarlo con personas reales.
+Si una integración no está configurada, su autorización aparece deshabilitada con una explicación.
+
+## Seguridad
+Cada mensaje pasa primero por `src/safety.py`. Gemini no interviene en el protocolo prioritario.
