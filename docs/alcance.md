@@ -1,11 +1,17 @@
-# Alcance
+# Alcance de Escucha Laboral V2
 
-## Propósito
-Validar el flujo conversacional, la interpretación contextual de expresiones colombianas y las preguntas de profundización.
+## Incluye
+- Conversación de varios turnos mediante estado de sesión.
+- Detección básica de expresiones y variantes.
+- Pregunta de aclaración.
+- Registro de frecuencia, duración e impacto.
+- Orientación preventiva experimental.
+- Reinicio de la conversación.
 
-## No incluye en esta etapa
+## No incluye
 - Diagnóstico clínico.
-- Aplicación formal de la batería oficial.
-- Integración con sistemas de RR. HH.
-- Decisiones sobre empleados.
-- IA generativa.
+- Aplicación formal de la Batería de Riesgo Psicosocial.
+- Confirmación de acoso laboral.
+- Envío automático de información a RR. HH.
+- Decisiones sobre trabajadores.
+- Inteligencia artificial generativa.

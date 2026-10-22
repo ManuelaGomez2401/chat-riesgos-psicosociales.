@@ -1,5 +1,7 @@
-id,mensaje,dimension_esperada,debe_preguntar
+id,mensaje,dimension_esperada,pregunta_esperada
 1,Todo es para ayer y no doy abasto,carga laboral,si
 2,Mi jefe no me para bolas cuando pido ayuda,apoyo social y liderazgo,si
-3,Estoy mamado,requiere aclaracion,si
+3,Estoy mamado,situación laboral por aclarar,si
 4,Mi jefe me la tiene montada,relaciones y liderazgo,si
+5,Vivo pegado al celular después del trabajo,jornada y desconexión,si
+6,Hola,situación laboral por aclarar,si

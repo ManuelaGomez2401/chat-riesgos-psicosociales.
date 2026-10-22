@@ -1,21 +1,51 @@
-# Escucha Laboral
+# Escucha Laboral - Versión 2
 
-MVP universitario de un chatbot orientado a identificar de forma preventiva señales asociadas con factores de riesgo psicosocial en entornos laborales colombianos.
+MVP universitario conversacional para la identificación preventiva de señales asociadas con factores de riesgo psicosocial en entornos laborales colombianos.
 
-## Alcance del MVP
-- Conversación escrita y voluntaria.
-- Diccionario inicial de colombianismos y expresiones laborales.
-- Preguntas de aclaración antes de inferir una dimensión.
-- Orientación preventiva.
-
-## Límites
-Este prototipo no realiza diagnósticos, no sustituye la Batería de Riesgo Psicosocial, no reemplaza a profesionales de SST/RR. HH. y no debe utilizarse para decisiones laborales individuales.
+## Novedades de la versión 2
+- Historial de conversación con `st.session_state`.
+- Interfaz de chat con `st.chat_message` y `st.chat_input`.
+- Pregunta aclaratoria.
+- Frecuencia, duración e impacto.
+- Orientación preventiva experimental.
+- Botón para reiniciar.
+- Código separado en módulos.
 
 ## Ejecutar localmente
+
+```bash
+python -m venv .venv
+```
+
+Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+macOS/Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Instalar y ejecutar:
+
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## Datos
-La versión académica debe utilizar casos ficticios o anónimos. No almacenar datos sensibles ni conversaciones reales en el repositorio.
+## Ejecutar pruebas
+
+```bash
+pytest
+```
+
+## Publicar en Streamlit Community Cloud
+- Repositorio: el repositorio de GitHub donde se suban estos archivos.
+- Rama: `main`.
+- Archivo principal: `app.py`.
+
+## Advertencia
+Este prototipo no diagnostica, no reemplaza la Batería de Riesgo Psicosocial y debe probarse inicialmente con datos ficticios o anonimizados.

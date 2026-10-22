@@ -1,6 +1,13 @@
-id,expresion,variantes,region,significados_posibles,dimension_probable,ambiguedad,requiere_aclaracion,pregunta_aclaratoria,validacion
-EXP001,no doy abasto,no alcanzo|no me da el tiempo,Colombia,sobrecarga|presion temporal,carga laboral,media,si,¿Esto ocurre ocasionalmente o se ha vuelto frecuente?,pendiente
-EXP002,me la tiene montada,me tiene entre ojos|me tiene fichado,Colombia,conflicto|trato diferencial|percepcion de hostigamiento,relaciones y liderazgo,alta,si,¿Qué comportamientos concretos te hacen sentir de esa manera?,pendiente
-EXP003,no me paran bolas,no me escuchan|no me prestan atencion,Colombia,falta de escucha|falta de apoyo,apoyo social y liderazgo,media,si,¿Has solicitado ayuda y qué respuesta has recibido?,pendiente
-EXP004,todo es para ayer,,Colombia,presion temporal,carga laboral,media,si,¿Con qué frecuencia tienes que atender tareas urgentes o con plazos muy cortos?,pendiente
-EXP005,estoy mamado,ya me mame,Colombia,cansancio|frustracion|rechazo,requiere aclaracion,alta,si,Cuando dices que estás mamado ¿se relaciona con la cantidad de trabajo el trato los horarios u otra situación?,pendiente
+id,expresion,variantes,categoria,dimension_probable,ambiguedad,requiere_aclaracion,pregunta_aclaratoria,region,estado_validacion
+EXP001,no doy abasto,no alcanzo|no me da el tiempo|estoy hasta el cuello,carga,carga laboral,media,si,¿Esto ocurre ocasionalmente o se ha vuelto frecuente?,Colombia,pendiente
+EXP002,todo es para ayer,todo es urgente|todo lo quieren ya,carga,carga laboral,media,si,¿Con qué frecuencia tienes que atender tareas urgentes o con plazos muy cortos?,Colombia,pendiente
+EXP003,me la tiene montada,me tiene entre ojos|me tiene fichado,relaciones,relaciones y liderazgo,alta,si,¿Qué comportamientos concretos te hacen sentir de esa manera?,Colombia,pendiente
+EXP004,no me paran bolas,no me escuchan|no me prestan atención,liderazgo,apoyo social y liderazgo,media,si,¿Has solicitado ayuda y qué respuesta has recibido?,Colombia,pendiente
+EXP005,estoy mamado,ya me mamé|estoy aburrido,ambigua,situación laboral por aclarar,alta,si,Cuando dices que estás mamado ¿se relaciona con la cantidad de trabajo el trato los horarios u otra situación?,Colombia,pendiente
+EXP006,no puedo desconectarme,vivo pegado al celular|me escriben a cualquier hora,jornada,jornada y desconexión,media,si,¿El trabajo continúa ocupando tiempo después de terminar tu jornada?,Colombia,pendiente
+EXP007,nadie valora lo que hago,nunca reconocen mi trabajo|da lo mismo esforzarse,reconocimiento,reconocimiento laboral,media,si,¿Qué situaciones te han hecho sentir que tu trabajo no es reconocido?,Colombia,pendiente
+EXP008,no puedo decidir nada,todo lo tengo que consultar|no tengo voz ni voto,autonomia,autonomía y control,media,si,¿En cuáles decisiones relacionadas con tu trabajo te gustaría tener mayor participación?,Colombia,pendiente
+EXP009,siento que me van a sacar,estoy en la cuerda floja|no sé si me van a renovar,seguridad,seguridad laboral,alta,si,¿Qué cambios o situaciones han aumentado esa sensación de incertidumbre?,Colombia,pendiente
+EXP010,el ambiente está pesado,hay mucha tensión|el ambiente está raro,relaciones,relaciones laborales,alta,si,¿Qué situaciones concretas hacen que percibas el ambiente de esa manera?,Colombia,pendiente
+EXP011,me toca apagar incendios,todo el día resolviendo urgencias,carga,carga laboral,media,si,¿Las urgencias forman parte habitual de tu trabajo o corresponden a una situación puntual?,Colombia,pendiente
+EXP012,no sé qué esperan de mí,no tengo claras mis funciones|me cambian las funciones,rol,claridad del rol,media,si,¿Qué responsabilidades o expectativas consideras que no están claras?,Colombia,pendiente
