@@ -1,15 +1,12 @@
-id,expresion,variantes,dimension_probable,pregunta_aclaratoria
-1,no doy abasto,no doi abasto|no alcanzo|no me da el tiempo|estoy hasta el cuello,carga laboral,¿Qué tareas o plazos están generando mayor presión?
-2,todo es para ayer,todo es urgente|todo lo quieren ya|todo es inmediato,carga laboral,¿Con qué frecuencia tienes que atender tareas urgentes?
-3,no me paran bolas,no me escuchan|no me prestan atención|ignoran lo que digo,apoyo social y liderazgo,¿Qué apoyo solicitaste y qué respuesta recibiste?
-4,me la tiene montada,me tiene entre ojos|me tiene fichado|me persigue,relaciones y liderazgo,¿Qué comportamientos concretos te hacen sentir de esa manera?
-5,no puedo desconectarme,vivo pegado al celular|me escriben a cualquier hora|trabajo fuera de horario,jornada y desconexión,¿El trabajo continúa ocupando tiempo después de terminar tu jornada?
-6,nadie valora lo que hago,nunca reconocen mi trabajo|solo ven mis errores|no reconocen nada,reconocimiento laboral,¿Qué situaciones te han hecho sentir que tu trabajo no es reconocido?
-7,no sé qué esperan de mí,no tengo claras mis funciones|me cambian las funciones|no sé qué me toca hacer,claridad del rol,¿Qué responsabilidades o expectativas no están claras?
-8,mis horarios son muy largos,trabajo muchas horas|tengo jornadas largas|salgo muy tarde|hago muchas horas extra|trabajo más de la cuenta,jornada y desconexión,¿Qué tan extensa suele ser tu jornada y con qué frecuencia ocurre?
-9,me tratan mal,recibo malos tratos|me hablan mal|me humillan|me faltan al respeto|me gritan|se burlan de mí,relaciones y liderazgo,¿Qué comportamientos concretos hacen que percibas un trato inadecuado?
-10,no tengo descanso,no puedo descansar|no tengo pausas|trabajo sin parar|no me dan descanso,jornada y desconexión,¿Con qué frecuencia puedes tomar pausas durante tu jornada?
-11,tengo demasiado trabajo,me cargan de trabajo|tengo muchas tareas|me ponen de todo|estoy sobrecargado,carga laboral,¿La cantidad de trabajo supera el tiempo o los recursos disponibles?
-12,no tengo control,no puedo decidir|todo lo deciden por mí|no tengo autonomía,autonomía y control,¿Sobre qué aspectos de tu trabajo no puedes tomar decisiones?
-13,tengo miedo de perder el trabajo,me van a echar|no sé si me renuevan|estoy en la cuerda floja,seguridad laboral,¿Qué cambios o situaciones han aumentado la incertidumbre sobre tu continuidad?
-14,hay mal ambiente,el ambiente está pesado|hay muchos conflictos|el equipo está dividido,relaciones laborales,¿Qué situaciones concretas hacen que percibas un ambiente laboral difícil?
+expresion,variantes,dimension
+no doy abasto,no doi abasto|no alcanzo|no me da el tiempo|estoy hasta el cuello,carga laboral
+todo es para ayer,todo es urgente|todo lo quieren ya,carga laboral
+mis horarios son muy largos,trabajo muchas horas|tengo jornadas largas|salgo muy tarde|horas extra,jornada y desconexión
+no puedo desconectarme,vivo pegado al celular|me escriben a cualquier hora,jornada y desconexión
+me tratan mal,me hablan mal|me humillan|me gritan|me faltan al respeto|se burlan de mí,relaciones y liderazgo
+no me paran bolas,no me escuchan|no me apoyan|me ignoran,apoyo social y liderazgo
+nadie valora lo que hago,no reconocen mi trabajo|solo ven mis errores,reconocimiento laboral
+no sé qué esperan de mí,no tengo claras mis funciones|me cambian las funciones,claridad del rol
+no puedo decidir,todo lo deciden por mí|no tengo autonomía,autonomía y control
+me van a echar,no sé si me renuevan|perder el trabajo,seguridad laboral
+hay mal ambiente,el ambiente está pesado|hay conflictos|el equipo está dividido,relaciones laborales

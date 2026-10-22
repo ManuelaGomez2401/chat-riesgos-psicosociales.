@@ -1,16 +1,13 @@
 dimension,nivel,mensaje
 carga laboral,Situación laboral puntual,Observa si la presión vuelve a presentarse y registra tareas plazos e interrupciones.
 carga laboral,Posible factor psicosocial recurrente,Conviene revisar prioridades distribución de carga plazos y apoyos disponibles.
-carga laboral,Revisión humana recomendada,La recurrencia y el impacto justifican solicitar una revisión humana de carga jornada y apoyos.
+carga laboral,Revisión humana recomendada,La recurrencia y el impacto justifican una revisión humana de carga jornada y apoyos.
 jornada y desconexión,Situación laboral puntual,Observa si la extensión de jornada fue excepcional y registra cuándo ocurrió.
 jornada y desconexión,Posible factor psicosocial recurrente,Conviene revisar horarios pausas horas extra y posibilidades reales de desconexión.
-jornada y desconexión,Revisión humana recomendada,La afectación sostenida del descanso o la vida personal justifica revisar jornada pausas y desconexión con un canal autorizado.
+jornada y desconexión,Revisión humana recomendada,La afectación sostenida justifica revisar jornada pausas y desconexión con un canal autorizado.
 relaciones y liderazgo,Situación laboral puntual,Registra el comportamiento concreto y diferencia un hecho aislado de un patrón repetido.
 relaciones y liderazgo,Posible factor psicosocial recurrente,Documenta hechos observables frecuencia contexto y apoyos solicitados sin concluir automáticamente que existe acoso.
-relaciones y liderazgo,Revisión humana recomendada,La recurrencia y el impacto justifican revisión humana mediante un canal institucional autorizado.
-relaciones laborales,Situación laboral puntual,Observa si el conflicto fue aislado y registra el contexto.
-relaciones laborales,Posible factor psicosocial recurrente,Conviene revisar comunicación apoyo y patrones repetidos dentro del equipo.
-relaciones laborales,Revisión humana recomendada,La continuidad y el impacto justifican una revisión humana del ambiente y las relaciones laborales.
+relaciones y liderazgo,Revisión humana recomendada,La recurrencia y el impacto justifican revisión humana mediante un canal autorizado.
 general,Situación laboral puntual,La situación parece puntual con la información disponible. Observa su evolución.
 general,Posible factor psicosocial recurrente,La situación presenta recurrencia o impacto y conviene revisar apoyos y condiciones laborales.
 general,Revisión humana recomendada,La frecuencia duración o impacto sugieren solicitar revisión humana mediante un canal autorizado.
