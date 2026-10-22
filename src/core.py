@@ -1,27 +1,18 @@
 import re, unicodedata, pandas as pd
 from rapidfuzz.fuzz import partial_ratio
-CATS={
-'carga laboral':['carga','sobrecarga','mucho trabajo','muchas tareas','plazo','urgente','para ayer'],
-'jornada y desconexión':['horario','jornada','turno','horas extra','salgo tarde','muchas horas','sin descanso','sin pausas','desconectarme'],
-'relaciones y liderazgo':['trato','tratan mal','maltrato','gritan','humillan','insultan','irrespeto','burlan','jefe','jefa'],
-'apoyo social y liderazgo':['no me escuchan','no me apoyan','ignoran','no me ayudan'],
-'reconocimiento laboral':['no reconocen','no valoran','solo ven mis errores'],
-'claridad del rol':['funciones','no se que hacer','cambian mis tareas'],
-'autonomía y control':['no puedo decidir','sin autonomia','todo lo deciden'],
-'seguridad laboral':['me van a echar','no me renuevan','perder el trabajo'],
-'relaciones laborales':['mal ambiente','conflicto','peleas','equipo dividido']}
+CATS={'carga laboral':['carga','sobrecarga','mucho trabajo','muchas tareas','plazo','urgente','para ayer'],'jornada y desconexión':['horario','jornada','turno','horas extra','salgo tarde','muchas horas','sin descanso','sin pausas','desconectarme'],'relaciones y liderazgo':['trato','tratan mal','maltrato','gritan','humillan','insultan','irrespeto','burlan','jefe','jefa'],'apoyo social y liderazgo':['no me escuchan','no me apoyan','ignoran','no me ayudan'],'reconocimiento laboral':['no reconocen','no valoran','solo ven mis errores'],'claridad del rol':['funciones','no se que hacer','cambian mis tareas'],'autonomía y control':['no puedo decidir','sin autonomia','todo lo deciden'],'seguridad laboral':['me van a echar','no me renuevan','perder el trabajo'],'relaciones laborales':['mal ambiente','conflicto','peleas','equipo dividido']}
 def norm(x):
  x=unicodedata.normalize('NFD',str(x).lower().strip());x=''.join(c for c in x if unicodedata.category(c)!='Mn');return re.sub(r'\s+',' ',re.sub(r'[^a-z0-9ñ\s]',' ',x)).strip()
 def detectar(t,df):
  n=norm(t);out=[]
  for _,r in df.iterrows():
   vals=[r.expresion]+str(r.variantes).split('|');score=max(100 if norm(v) in n else partial_ratio(norm(v),n) for v in vals)
-  if score>=78:out.append((r.dimension,score))
+  if score>=78:out.append((r.dimension,score,'diccionario'))
  for d,ks in CATS.items():
-  if any(norm(k) in n for k in ks):out.append((d,90))
+  if any(norm(k) in n for k in ks):out.append((d,90,'categoria'))
  seen=set();ans=[]
- for d,s in sorted(out,key=lambda z:z[1],reverse=True):
-  if d not in seen:ans.append(d);seen.add(d)
+ for d,s,f in sorted(out,key=lambda z:z[1],reverse=True):
+  if d not in seen:ans.append({'dimension':d,'confianza':round(s/100,2),'fuente':f});seen.add(d)
  return ans[:3]
 def relacion(t):
  t=norm(t)
