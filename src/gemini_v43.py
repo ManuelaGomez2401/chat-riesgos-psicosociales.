@@ -17,3 +17,11 @@ def interpretar(texto_anonimo,etapa,contexto):
         if getattr(respuesta,"parsed",None):return respuesta.parsed
         return InterpretacionIA.model_validate_json(respuesta.text)
     except Exception:return None
+
+
+def interpretar_relacion(texto_anonimo):
+    analisis=interpretar(texto_anonimo,"relacion_laboral",{"objetivo":"clasificar si la causa es trabajo, personal, ambas o incierta"})
+    if not analisis:return None
+    if analisis.relacion_laboral=="clara":return "trabajo"
+    if analisis.relacion_laboral=="no_clara":return "personal"
+    return "incierta"

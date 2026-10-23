@@ -18,7 +18,7 @@ def relacion(t):
  t=norm(t)
  if any(x in t for x in ['ambas','las dos','trabajo y personal']):return'ambas'
  if any(x in t for x in ['personal','familia','pareja','fuera del trabajo']):return'personal'
- if any(x in t for x in ['no se','no estoy seguro','no estoy segura','tal vez']):return'incierta'
+ if any(x in t for x in ['no se','aun no se','aun no lo se','todavia no se','no lo tengo claro','aun no lo tengo claro','todavia no lo tengo claro','no estoy seguro','no estoy segura','tal vez','quizas']):return'incierta'
  if any(x in t for x in ['trabajo','laboral','jefe','empresa','tareas','turno']):return'trabajo'
 def frecuencia(t):
  t=norm(t);m=re.search(r'(\d+)\s*veces?',t)

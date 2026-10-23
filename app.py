@@ -1,7 +1,7 @@
 import uuid, pandas as pd, streamlit as st
 from src.core import *
 from src.safety import detectar_prioridad, RESPUESTA_PRIORITARIA, RESPUESTA_PELIGRO_INMEDIATO, RESPUESTA_SIN_PELIGRO_INMEDIATO
-from src.gemini_v43 import interpretar as interpretar_ia, disponible as ia_disponible
+from src.gemini_v43 import interpretar as interpretar_ia, interpretar_relacion as interpretar_relacion_ia, disponible as ia_disponible
 from src.anonymizer import anonimizar
 from src.fusion import fusionar
 from src.orientation import calcular as calcular_orientacion
@@ -46,18 +46,30 @@ if x:
  if st.session_state.prioridad_activa:
   q=norm(x)
   if q.startswith('si') or q.startswith('sí'):
-   add('assistant',RESPUESTA_PELIGRO_INMEDIATO);st.session_state.etapa='emergencia'
+   add('assistant',RESPUESTA_PELIGRO_INMEDIATO);st.session_state.prioridad_activa=False;st.session_state.etapa='emergencia'
   elif q.startswith('no'):
-   add('assistant',RESPUESTA_SIN_PELIGRO_INMEDIATO);st.session_state.etapa='apoyo_humano'
+   add('assistant',RESPUESTA_SIN_PELIGRO_INMEDIATO);st.session_state.prioridad_activa=False;st.session_state.etapa='contexto'
   else:add('assistant','Necesito confirmar algo importante: ¿estás en peligro inmediato en este momento? Responde **sí** o **no**.')
   st.rerun()
  e=st.session_state.etapa
  if e=='relato':st.session_state.dims=detectar(x,df);add('assistant','Gracias por contármelo. ¿Se relaciona principalmente con el trabajo, con una situación personal, con ambas o no estás seguro/a?');st.session_state.etapa='relacion_laboral'
  elif e=='relacion_laboral':
   r=relacion(x)
-  if r=='personal':add('assistant','Gracias por contarme cómo te has sentido. 💚\n\nNo hemos identificado elementos suficientes para relacionar tu situación con factores de riesgo psicosocial en el trabajo. Si lo que necesitas está relacionado con otros aspectos de tu vida, te animamos a buscar un servicio de orientación o apoyo adecuado.\n\nTu bienestar es importante. Gracias por compartir este momento conmigo. 🌿');st.session_state.etapa='fin'
-  elif r in ['trabajo','ambas','incierta']:add('assistant','¿Qué situación concreta del trabajo está influyendo? Describe tareas, horarios, trato, cambios o relaciones, sin nombres.');st.session_state.etapa='contexto'
-  else:add('assistant','¿Dirías que se relaciona con el trabajo, con algo personal, con ambos o aún no lo tienes claro?')
+  fuente_relacion='reglas locales'
+  if r is None and ia_disponible() and st.session_state.get('autoriza_ia'):
+   r=interpretar_relacion_ia(anonimizar(x))
+   fuente_relacion='IA experimental'
+  if r=='personal':
+   add('assistant','Gracias por contarme cómo te has sentido. 💚\n\nNo hemos identificado elementos suficientes para relacionar tu situación con factores de riesgo psicosocial en el trabajo. Si necesitas apoyo con otros aspectos de tu vida, te animamos a buscar un servicio de orientación adecuado.\n\nTu bienestar es importante. 🌿')
+   st.session_state.etapa='fin'
+  elif r in ['trabajo','ambas']:
+   add('assistant',f'Gracias por aclararlo. ¿Qué situación concreta del trabajo está influyendo? Describe tareas, horarios, trato, cambios o relaciones, sin nombres.\n\n_Interpretación asistida por {fuente_relacion}._')
+   st.session_state.etapa='contexto'
+  elif r=='incierta':
+   add('assistant','Está bien no tenerlo claro todavía. 💚\n\nPodemos explorarlo sin asumir una causa. ¿Qué estaba ocurriendo justo antes de sentirte así y en qué contexto suele suceder?')
+   st.session_state.etapa='contexto'
+  else:
+   add('assistant','No logré interpretar esa respuesta. Puedes decirme si se relaciona con el trabajo, con algo personal, con ambos o si todavía no lo tienes claro.')
  elif e=='contexto':
   mensaje_anonimo=anonimizar(x)
   locales=detectar(mensaje_anonimo,df)
