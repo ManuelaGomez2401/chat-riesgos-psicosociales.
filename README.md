@@ -1,13 +1,5 @@
-# Escucha Laboral V4.3
+# Escucha Laboral V4.4
 
-Incluye Gemini en contexto, frecuencia, duración, impactos y resumen; salida estructurada Pydantic; anonimización básica; fusión de reglas e IA; propuesta de expresiones; orientación final local; protocolo prioritario local y avatares.
+Gemini participa en relato, relación laboral, contexto, frecuencia, duración, impactos y redacción final. El protocolo prioritario y la clasificación final permanecen locales.
 
-## Secrets
-```toml
-GEMINI_API_KEY="..."
-SUPABASE_URL="..."
-SUPABASE_KEY="..."
-```
-
-## Publicación
-Elimina cualquier carpeta `pages/`, sube el contenido interno de esta carpeta y configura `app.py` como archivo principal.
+Incluye bienvenida extensa, cierre amable sin indicadores, cierre cálido cuando se recomienda acompañamiento y plantillas locales de respaldo.
