@@ -1,7 +1,11 @@
 import uuid, pandas as pd, streamlit as st
 from src.core import *
 from src.safety import detectar_prioridad, RESPUESTA_PRIORITARIA, RESPUESTA_PELIGRO_INMEDIATO, RESPUESTA_SIN_PELIGRO_INMEDIATO
-from src.ai_helper import interpretar as interpretar_ia, disponible as ia_disponible
+from src.gemini_v43 import interpretar as interpretar_ia, disponible as ia_disponible
+from src.anonymizer import anonimizar
+from src.fusion import fusionar
+from src.orientation import calcular as calcular_orientacion
+from src.proposals import crear as crear_propuesta
 from src.storage import guardar as guardar_sesion, disponible as db_disponible
 DOG='assets/perrito.png'; HUMAN='assets/persona.png'
 st.set_page_config(page_title='Un espacio para escucharte',page_icon='🐾',layout='centered')
@@ -13,7 +17,7 @@ st.markdown(f'<div class="head"><div class="row"><img class="mascot" src="data:i
 def datos():return pd.read_csv('data/diccionario.csv'),pd.read_csv('data/recomendaciones.csv')
 def add(r,c):st.session_state.msg.append({'role':r,'content':c})
 def init():
- for k,v in {'etapa':'relato','msg':[],'dims':[],'sid':str(uuid.uuid4()),'prioridad_activa':False,'resultado':'sin_clasificar','ia_usada':False}.items():
+ for k,v in {'etapa':'relato','msg':[],'dims':[],'sid':str(uuid.uuid4()),'prioridad_activa':False,'resultado':'sin_clasificar','ia_usada':False,'resumen':None,'propuesta':None}.items():
   if k not in st.session_state:st.session_state[k]=v
  if not st.session_state.msg:add('assistant','¡Hola! Me alegra que estés aquí. 💚\n\nPuedes expresarte con tus propias palabras. Vamos paso a paso.')
 def reset():
@@ -23,7 +27,8 @@ init();df,rec=datos()
 with st.expander('Participación y uso de la información', expanded=not st.session_state.get('participa', False)):
  st.checkbox('Acepto participar voluntariamente en esta demostración.', key='participa')
  st.checkbox('Autorizo guardar una copia de esta conversación para revisión académica.', key='autoriza_guardado', disabled=not db_disponible())
- st.checkbox('Autorizo enviar a Gemini fragmentos sin identificadores cuando el detector no comprenda.', key='autoriza_ia', disabled=not ia_disponible())
+ st.checkbox('Autorizo enviar a Gemini fragmentos sin identificadores para interpretar respuestas abiertas.', key='autoriza_ia', disabled=not ia_disponible())
+ st.checkbox('Autorizo usar expresiones anonimizadas para proponer mejoras al diccionario.', key='autoriza_aprendizaje', disabled=not db_disponible())
  if not ia_disponible(): st.caption('Gemini no está configurado. Agrega GEMINI_API_KEY en Streamlit Secrets para habilitar esta autorización.')
  if not db_disponible(): st.caption('El guardado no está configurado. Agrega SUPABASE_URL y SUPABASE_KEY para habilitarlo.')
 if not st.session_state.get('participa'):st.stop()
@@ -54,40 +59,50 @@ if x:
   elif r in ['trabajo','ambas','incierta']:add('assistant','¿Qué situación concreta del trabajo está influyendo? Describe tareas, horarios, trato, cambios o relaciones, sin nombres.');st.session_state.etapa='contexto'
   else:add('assistant','¿Dirías que se relaciona con el trabajo, con algo personal, con ambos o aún no lo tienes claro?')
  elif e=='contexto':
-  d=detectar(x,df)
-  pregunta_ia=''
-  if not d and ia_disponible() and st.session_state.get('autoriza_ia'):
-   analisis=interpretar_ia(x)
-   if analisis:
-    d=analisis.get('dimensiones',[])
-    pregunta_ia=analisis.get('pregunta_aclaratoria','')
-    st.session_state.ia_usada=True
-  st.session_state.dims=list(dict.fromkeys(st.session_state.dims+d))
-  if d:
-   extra=f"\n\nPara comprenderlo mejor: {pregunta_ia}" if pregunta_ia else ''
-   add('assistant',f"Podría haber elementos relacionados con {', '.join(st.session_state.dims)}. ¿Representa lo que quisiste expresar? Responde sí, parcialmente o no.{extra}")
+  mensaje_anonimo=anonimizar(x)
+  locales=detectar(mensaje_anonimo,df)
+  analisis=None
+  if ia_disponible() and st.session_state.get('autoriza_ia'):
+   analisis=interpretar_ia(mensaje_anonimo,'contexto',{'dimensiones':st.session_state.dims})
+   if analisis:st.session_state.ia_usada=True
+  decision=fusionar(locales,analisis)
+  st.session_state.dims=list(dict.fromkeys(st.session_state.dims+decision['dimensiones']))
+  if analisis and st.session_state.get('autoriza_aprendizaje'):st.session_state.propuesta=crear_propuesta(analisis,mensaje_anonimo)
+  if decision['dimensiones']:
+   add('assistant',f"Podría haber elementos relacionados con {', '.join(st.session_state.dims)}. ¿Representa lo que quisiste expresar? Responde sí, parcialmente o no.\n\n_Interpretación asistida por {decision['fuente']}._")
    st.session_state.etapa='confirmar'
-  else:add('assistant','¿Se relaciona con carga de trabajo, horarios, trato, apoyo, funciones, autonomía, reconocimiento o estabilidad laboral?')
+  else:add('assistant',decision['pregunta'])
  elif e=='confirmar':
   q=norm(x)
   if q.startswith('no') or 'parcial' in q:add('assistant','Gracias por corregirme. ¿Cómo describirías el aspecto laboral principal?');st.session_state.etapa='contexto'
   elif 'si' in q:add('assistant','¿Con qué frecuencia ocurre?');st.session_state.etapa='frecuencia'
   else:add('assistant','¿La interpretación fue correcta? Responde sí, parcialmente o no.')
  elif e=='frecuencia':
-  v=frecuencia(x)
-  if v:st.session_state.frec=v;add('assistant','¿Desde cuándo ocurre?');st.session_state.etapa='duracion'
+  analisis=interpretar_ia(anonimizar(x),'frecuencia',{'dimensiones':st.session_state.dims}) if ia_disponible() and st.session_state.get('autoriza_ia') else None
+  v=analisis.frecuencia if analisis and analisis.frecuencia else frecuencia(x)
+  if v:st.session_state.frec=v;add('assistant',analisis.pregunta_siguiente if analisis and analisis.pregunta_siguiente else '¿Desde cuándo ocurre?');st.session_state.etapa='duracion'
   else:add('assistant','No entendí la frecuencia. ¿Ocurrió una vez, a veces, varias veces por semana o casi todos los días?')
  elif e=='duracion':
-  v=duracion(x)
-  if v:st.session_state.dur=v;add('assistant','¿Cómo te ha afectado? Puedes mencionar sueño, concentración, motivación, relaciones, vida personal o tareas.');st.session_state.etapa='impacto'
+  analisis=interpretar_ia(anonimizar(x),'duracion',{'frecuencia':st.session_state.get('frec')}) if ia_disponible() and st.session_state.get('autoriza_ia') else None
+  v=analisis.duracion if analisis and analisis.duracion else duracion(x)
+  if v:st.session_state.dur=v;add('assistant',analisis.pregunta_siguiente if analisis and analisis.pregunta_siguiente else '¿Cómo te ha afectado esta situación?');st.session_state.etapa='impacto'
   else:add('assistant','No entendí la duración. ¿Desde hace días, semanas, meses o más de seis meses?')
  elif e=='impacto':
-  v=impactos(x)
+  analisis=interpretar_ia(anonimizar(x),'impactos',{'frecuencia':st.session_state.get('frec'),'duracion':st.session_state.get('dur')}) if ia_disponible() and st.session_state.get('autoriza_ia') else None
+  v=list(analisis.impactos) if analisis and analisis.impactos else impactos(x)
   if v:
-   n=nivel(st.session_state.frec,st.session_state.dur,v);st.session_state.resultado=n;dims=st.session_state.dims or ['situación por aclarar'];m=rec[(rec.dimension.isin(dims))&(rec.nivel==n)];m=m if not m.empty else rec[(rec.dimension=='general')&(rec.nivel==n)];txt=m.iloc[0].mensaje if not m.empty else 'Observa la evolución.';add('assistant',f'**Resultado preventivo provisional: {n}.**\n\nAspectos explorados: {", ".join(dims)}.\n\n{txt}\n\nNo es diagnóstico ni medición oficial.');st.session_state.etapa='fin'
+   st.session_state.imps=v
+   if analisis and analisis.resumen_neutral:
+    st.session_state.resumen=analisis.resumen_neutral;add('assistant',f"Antes de continuar, este es un resumen neutral de lo conversado:\n\n**{st.session_state.resumen}**\n\n¿Representa correctamente lo que compartiste?");st.session_state.etapa='confirmar_resumen'
+   else:
+    r=calcular_orientacion(st.session_state.frec,st.session_state.dur,v);st.session_state.resultado=r['orientacion'];add('assistant',f"**Resultado preventivo provisional: {r['orientacion']}**\n\nCalculado mediante reglas locales ({r['version']}). Gemini no decide la orientación final.");st.session_state.etapa='fin'
   else:add('assistant','¿Ha afectado descanso, concentración, motivación, relaciones, vida personal o tareas?')
+ elif e=='confirmar_resumen':
+  if norm(x).startswith('si'):
+   r=calcular_orientacion(st.session_state.frec,st.session_state.dur,st.session_state.imps);st.session_state.resultado=r['orientacion'];add('assistant',f"**Resultado preventivo provisional: {r['orientacion']}**\n\nCalculado mediante reglas locales ({r['version']}). Gemini no decide la orientación final.");st.session_state.etapa='fin'
+  else:add('assistant','Gracias por corregirlo. Cuéntame qué parte debería ajustar.');st.session_state.etapa='contexto'
  elif e in ['fin','emergencia','apoyo_humano']:
   if st.session_state.get('autoriza_guardado') and db_disponible():
-   guardar_sesion({'codigo_anonimo':st.session_state.sid,'mensajes':st.session_state.msg,'dimensiones':st.session_state.dims,'orientacion':st.session_state.resultado,'version':'4.2'})
+   guardar_sesion({'codigo_anonimo':st.session_state.sid,'mensajes':st.session_state.msg,'dimensiones':st.session_state.dims,'orientacion':st.session_state.resultado,'version':'4.3'})
   add('assistant','La conversación terminó. Usa Reiniciar para comenzar otra prueba.')
  st.rerun()
