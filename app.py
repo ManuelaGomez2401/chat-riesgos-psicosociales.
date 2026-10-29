@@ -5,7 +5,7 @@ from src.anonymizer import anonimizar
 from src.ai_budget import MAX_CALLS_PER_MONTH, MAX_CALLS_PER_SESSION, monthly_calls, can_call
 from src.gemini import disponible as ia_disponible, analizar
 from src.local import norm, relacion, detectar, frecuencia, duracion, impactos
-from src.messages import BIENVENIDA, SIN_INDICADORES, ACOMPANAMIENTO
+from src.messages import BIENVENIDA, SIN_INDICADORES, ACOMPANAMIENTO_GENERAL, ACOMPANAMIENTO_RELACIONES, INFORMACION_INSUFICIENTE
 from src.orientation import calcular
 from src.safety import detectar_prioridad, PRIORIDAD
 from src.storage import (
@@ -41,7 +41,7 @@ def add(role,text,used_ai=False):
             st.session_state.storage_error=str(exc)
 
 def init():
-    defaults={'etapa':'relato','msg':[],'dims':[],'frec':None,'dur':None,'imps':[],'db_session':None,'prioridad':False,'gemini_calls':0,'storage_error':None}
+    defaults={'etapa':'relato','msg':[],'dims':[],'frec':None,'dur':None,'imps':[],'db_session':None,'prioridad':False,'gemini_calls':0,'storage_error':None,'context_attempts':0,'gemini_budget_error':None,'consentimientos_confirmados':False}
     for k,v in defaults.items():
         if k not in st.session_state:st.session_state[k]=v
     if not st.session_state.msg:add('assistant',BIENVENIDA)
@@ -85,19 +85,23 @@ mode=st.sidebar.radio('Vista académica',['Chat conversacional','Aprobación de 
 if mode=='Aprobación de expresiones':
     review_panel();st.stop()
 
-with st.expander('Participación y uso académico',expanded=not st.session_state.get('participa',False)):
+with st.expander('Participación y uso académico', expanded=not st.session_state.get('consentimientos_confirmados',False)):
+    st.markdown('**Antes de comenzar, revisa cada autorización.** Solo la participación es obligatoria. Las demás son opcionales y puedes dejarlas sin marcar.')
     st.checkbox('Acepto participar voluntariamente.',key='participa')
     st.markdown('<div class="consent-note">Permite iniciar la conversación. Puedes detenerte o reiniciar cuando quieras.</div>',unsafe_allow_html=True)
     st.checkbox('Autorizo guardar una copia anonimizada del chat.',key='autoriza_guardado',disabled=not configurado())
-    st.markdown('<div class="consent-note">Guarda en Supabase una versión en la que correos, teléfonos, URL y algunos documentos son reemplazados. Se usa para revisión académica; no se publica directamente.</div>',unsafe_allow_html=True)
+    st.markdown('<div class="consent-note">Guarda en Supabase una copia para revisión académica. La aplicación reemplaza correos, teléfonos, URL y algunos documentos; no garantiza eliminar todos los nombres o empresas.</div>',unsafe_allow_html=True)
     st.checkbox('Autorizo enviar fragmentos anonimizados a Gemini.',key='autoriza_ia',disabled=not ia_disponible())
-    st.markdown('<div class="consent-note">Gemini ayuda a interpretar lenguaje abierto y sugerir preguntas. No decide la orientación final. Se limita a 3 llamadas por conversación y 100 llamadas en 30 días.</div>',unsafe_allow_html=True)
+    st.markdown('<div class="consent-note">Gemini ayuda a interpretar lenguaje abierto y sugerir preguntas. No diagnostica ni decide la orientación final. Se limita a 3 llamadas por conversación y 100 en 30 días.</div>',unsafe_allow_html=True)
     st.checkbox('Autorizo proponer expresiones anonimizadas para mejorar el diccionario.',key='autoriza_aprendizaje',disabled=not configurado())
-    st.markdown('<div class="consent-note">Si aparece una frase nueva, se guarda como propuesta pendiente. No entra al diccionario hasta que sea aprobada en el módulo académico de revisión.</div>',unsafe_allow_html=True)
-    if st.button('Comprobar conexión con Supabase'):
-        ok,detalle=prueba_conexion();(st.success if ok else st.error)(detalle)
-
-if not st.session_state.get('participa'):st.stop()
+    st.markdown('<div class="consent-note">Una frase nueva se guarda como propuesta pendiente. No entra al diccionario hasta que una persona autorizada la aprueba en el módulo académico.</div>',unsafe_allow_html=True)
+    if st.button('Revisé las opciones y deseo iniciar',type='primary',use_container_width=True):
+        if not st.session_state.get('participa'):
+            st.error('Debes aceptar la participación voluntaria para iniciar.')
+        else:
+            st.session_state.consentimientos_confirmados=True
+            st.rerun()
+if not st.session_state.get('consentimientos_confirmados'):st.stop()
 if st.session_state.autoriza_guardado and not st.session_state.db_session:
     try:
         creada=crear_sesion({'app_version':VERSION,'consent_store':True,'consent_ai':bool(st.session_state.autoriza_ia),'consent_learning':bool(st.session_state.autoriza_aprendizaje)})
@@ -108,8 +112,10 @@ c1,c2=st.columns([5,1])
 with c1:
     allowed,reason=can_call() if st.session_state.autoriza_ia and ia_disponible() else (False,'IA no autorizada')
     st.markdown(f'<span class="status">Etapa: {st.session_state.etapa} · IA {st.session_state.gemini_calls}/{MAX_CALLS_PER_SESSION} · Datos {"activos" if st.session_state.db_session else "temporales"}</span>',unsafe_allow_html=True)
+    if st.session_state.autoriza_ia and ia_disponible(): st.caption(reason)
 with c2:st.button('Reiniciar',on_click=reset)
 if st.session_state.storage_error:st.warning('La conversación sigue, pero ocurrió un error de guardado: '+st.session_state.storage_error)
+if st.session_state.gemini_budget_error:st.warning('La telemetría mensual de Gemini tuvo un error, pero se mantiene el límite local de 3 llamadas: '+st.session_state.gemini_budget_error)
 
 for m in st.session_state.msg:
     with st.chat_message(m['role'],avatar=DOG if m['role']=='assistant' else HUMAN):st.write(m['content'])
@@ -129,8 +135,14 @@ if x:
         if st.session_state.autoriza_aprendizaje and ia and ia.expresion_nueva and st.session_state.db_session:
             try:crear_propuesta({'session_id':st.session_state.db_session,'expression':ia.expresion_nueva,'dimensions':ia.dimensiones,'evidence':anon})
             except Exception as exc:st.session_state.storage_error=str(exc)
-        if st.session_state.dims:add('assistant',f"Podría haber elementos relacionados con **{', '.join(st.session_state.dims)}**. ¿Representa lo que quisiste expresar?",bool(ia));st.session_state.etapa='confirmar'
-        else:add('assistant',ia.pregunta if ia and ia.pregunta else '¿Puedes contar un ejemplo concreto?',bool(ia))
+        if st.session_state.dims:
+            st.session_state.context_attempts=0
+            add('assistant',f"Por lo que describes, podría haber elementos relacionados con **{', '.join(st.session_state.dims)}**. Esto no confirma acoso ni una situación específica. ¿Representa lo que quisiste expresar?",bool(ia));st.session_state.etapa='confirmar'
+        else:
+            st.session_state.context_attempts+=1
+            if st.session_state.context_attempts==1:add('assistant',ia.pregunta if ia and ia.pregunta else '¿Puedes describir una conducta concreta, por ejemplo palabras, acercamientos, seguimiento, horarios o tareas?',bool(ia))
+            elif st.session_state.context_attempts==2:add('assistant','Aún no tengo información suficiente para proponer una dimensión. Puedes contar qué ocurrió, cuándo sucede y cómo te afecta, o escribir **finalizar**.',bool(ia))
+            else:add('assistant','No fue posible interpretar la situación con suficiente claridad. Cerraremos sin clasificar para evitar una conclusión incorrecta.');st.session_state.etapa='fin'
     elif e=='confirmar':
         if norm(x).startswith('si'):add('assistant','¿Con qué frecuencia ocurre?');st.session_state.etapa='frecuencia'
         else:add('assistant','Gracias por corregirme. ¿Cómo describirías el aspecto laboral principal?');st.session_state.etapa='contexto'
@@ -143,7 +155,12 @@ if x:
         if v:st.session_state.dur=v;add('assistant','¿Cómo te ha afectado?',bool(ia));st.session_state.etapa='impacto'
         else:add('assistant','¿Desde hace días, semanas, meses o más de seis meses?')
     elif e=='impacto':
-        v=ia.impactos if ia and ia.impactos else impactos(x);st.session_state.imps=v;r=calcular(st.session_state.frec,st.session_state.dur,v);msg=SIN_INDICADORES if r['tipo']=='sin_indicadores' else ACOMPANAMIENTO;add('assistant',msg,bool(ia));st.session_state.etapa='fin'
+        v=ia.impactos if ia and ia.impactos else impactos(x);st.session_state.imps=v;r=calcular(st.session_state.frec,st.session_state.dur,v)
+        if r['tipo']=='sin_indicadores': msg=SIN_INDICADORES
+        elif not st.session_state.dims: msg=INFORMACION_INSUFICIENTE
+        elif any(d in st.session_state.dims for d in ['relaciones y liderazgo','relaciones laborales']): msg=ACOMPANAMIENTO_RELACIONES
+        else: msg=ACOMPANAMIENTO_GENERAL
+        add('assistant',msg,bool(ia));st.session_state.etapa='fin'
         if st.session_state.db_session:
             try:guardar_resultado({'session_id':st.session_state.db_session,'relationship':'laboral','dimensions':st.session_state.dims,'frequency':st.session_state.frec,'duration':st.session_state.dur,'impacts':v,'orientation':r['tipo'],'rule_version':r['version']})
             except Exception as exc:st.session_state.storage_error=str(exc)

@@ -1,8 +1,7 @@
-import os
+from datetime import datetime, timedelta, timezone
 import streamlit as st
 from src.storage import configurado, cliente
 
-# Límites conservadores para el prototipo académico.
 MAX_CALLS_PER_SESSION = 3
 MAX_CALLS_PER_MONTH = 100
 MAX_INPUT_CHARS = 2500
@@ -15,19 +14,21 @@ def _session_calls():
 
 
 def monthly_calls():
+    """Cuenta las llamadas de los últimos 30 días usando una fecha ISO válida."""
     if not configurado(admin=True):
-        # Sin contador global confiable, no habilitamos llamadas pagas.
         return None
     try:
+        since = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
         response = (
             cliente(admin=True)
             .table("gemini_usage")
-            .select("id", count="exact")
-            .gte("created_at", "now() - interval '30 days'")
+            .select("id", count="exact", head=True)
+            .gte("created_at", since)
             .execute()
         )
         return int(response.count or 0)
-    except Exception:
+    except Exception as exc:
+        st.session_state.gemini_budget_error = str(exc)
         return None
 
 
@@ -35,11 +36,13 @@ def can_call():
     if _session_calls() >= MAX_CALLS_PER_SESSION:
         return False, "Límite de 3 llamadas de IA alcanzado en esta conversación."
     total = monthly_calls()
+    # Si falla el contador global, se permite la llamada bajo el límite local de 3,
+    # pero se informa el problema. Así un error de telemetría no desactiva Gemini.
     if total is None:
-        return False, "No se pudo verificar el límite mensual. Se utilizarán reglas locales."
+        return True, "Límite mensual no verificable; aplica el límite local de 3 llamadas."
     if total >= MAX_CALLS_PER_MONTH:
-        return False, "Límite académico mensual de IA alcanzado. Se utilizarán reglas locales."
-    return True, "IA disponible"
+        return False, "Límite académico mensual de IA alcanzado."
+    return True, f"IA disponible. Uso mensual: {total}/{MAX_CALLS_PER_MONTH}."
 
 
 def prepare_text(text):
@@ -58,8 +61,7 @@ def register_usage(session_id, stage, input_text, output_text, success=True):
                     "input_chars": len(str(input_text)),
                     "output_chars": len(str(output_text)),
                     "success": bool(success),
-                },
-                returning="minimal",
+                }, returning="minimal"
             ).execute()
-        except Exception:
-            pass
+        except Exception as exc:
+            st.session_state.gemini_budget_error = str(exc)
