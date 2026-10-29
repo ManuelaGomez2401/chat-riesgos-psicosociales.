@@ -1,6 +1,6 @@
-import pandas as pd
-from src.core import *
-df=pd.read_csv('data/diccionario.csv')
-def test_horario():assert'jornada y desconexión'in detectar('mis horarios son largos',df)
-def test_trato():assert'relaciones y liderazgo'in detectar('me tratan mal',df)
-def test_personal():assert relacion('problemas familiares')=='personal'
+from src.anonymizer import anonimizar
+from src.orientation import calcular
+from src.safety import detectar_prioridad
+def test_anon():assert '[CORREO]' in anonimizar('a@b.com')
+def test_prioridad():assert detectar_prioridad('me quiero matar')
+def test_resultado():assert calcular('Casi todos los días','Algunos meses',['Descanso'])['tipo']=='acompanamiento'

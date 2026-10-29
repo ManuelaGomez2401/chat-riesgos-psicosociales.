@@ -4,4 +4,4 @@ def calcular(f,d,impactos):
  elif p<=1:tipo='puntual'
  elif p<=4:tipo='seguimiento'
  else:tipo='acompanamiento'
- return {'tipo':tipo,'puntaje':p,'version':'ORIENTACION_V3'}
+ return {'tipo':tipo,'puntaje':p,'version':'ORIENTACION_ACADEMICA_V1'}

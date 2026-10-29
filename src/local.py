@@ -1,22 +1,22 @@
 import re,unicodedata,pandas as pd
 from rapidfuzz.fuzz import partial_ratio
-CAT={"carga laboral":["carga","sobrecarga","mucho trabajo","muchas tareas","urgente"],"jornada y desconexión":["horario","jornada","turno","horas extra","muchas horas","sin descanso"],"relaciones y liderazgo":["trato","tratan mal","gritan","humillan","hostiga","intimida","jefe","jefa"],"apoyo social y liderazgo":["no me escuchan","no me apoyan","ignoran"],"reconocimiento laboral":["no reconocen","no valoran"],"claridad del rol":["funciones","no se que hacer"],"autonomía y control":["no puedo decidir","sin autonomia"],"seguridad laboral":["me van a echar","no me renuevan"],"relaciones laborales":["mal ambiente","conflicto","peleas"]}
 def norm(x):
  x=unicodedata.normalize('NFD',str(x).lower());x=''.join(c for c in x if unicodedata.category(c)!='Mn');return re.sub(r'\s+',' ',re.sub(r'[^a-z0-9ñ\s]',' ',x)).strip()
 def relacion(x):
  t=norm(x)
  if any(v in t for v in ['ambas','las dos','trabajo y personal']):return'ambas'
  if any(v in t for v in ['personal','familia','pareja','fuera del trabajo']):return'personal'
- if any(v in t for v in ['no se','aun no se','aun no lo se','todavia no se','no lo tengo claro','no estoy seguro','no estoy segura','quizas','tal vez']):return'incierta'
+ if any(v in t for v in ['no se','aun no se','todavia no se','no lo tengo claro','no estoy seguro','tal vez']):return'incierta'
  if any(v in t for v in ['trabajo','laboral','jefe','empresa','tareas','turno']):return'trabajo'
 def detectar(x,df):
  t=norm(x);out=[]
  for _,r in df.iterrows():
-  vals=[r.expresion]+str(r.variantes).split('|');s=max(100 if norm(v) in t else partial_ratio(norm(v),t) for v in vals)
-  if s>=78:out.append(r.dimension)
- for d,ks in CAT.items():
-  if any(norm(k) in t for k in ks):out.append(d)
- return list(dict.fromkeys(out))[:3]
+  vals=[str(r.expresion)]+str(r.variantes or '').split('|');score=max(100 if norm(v) in t else partial_ratio(norm(v),t) for v in vals if v)
+  if score>=78:out.append({'dimension':str(r.dimension),'expresion':str(r.expresion),'confianza':round(score/100,2),'pregunta':str(r.pregunta)})
+ seen=set();ans=[]
+ for i in sorted(out,key=lambda z:z['confianza'],reverse=True):
+  if i['dimension'] not in seen:ans.append(i);seen.add(i['dimension'])
+ return ans[:3]
 def frecuencia(x):
  t=norm(x);m=re.search(r'(\d+)\s*veces?',t)
  if m:
