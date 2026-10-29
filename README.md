@@ -1,9 +1,16 @@
-# Conversemos V5.4 - consentimientos y orientación práctica
+# Parche V5.6: conversación contextual con Gemini
 
-- El listado de autorizaciones permanece abierto hasta pulsar “Revisé las opciones y deseo iniciar”.
-- Marcar participación ya no cierra el bloque automáticamente.
-- La verificación de Supabase no aparece en la vista pública.
-- El estado técnico solo muestra “Datos activos” o “Datos temporales”.
-- Los cierres incluyen opciones concretas: persona de confianza, Bienestar, SST, Recursos Humanos y Comité de Convivencia Laboral.
-- Si el supervisor o un canal está involucrado, se recomienda otro canal institucional o apoyo externo.
-- El chat no confirma acoso ni ofrece conclusiones legales.
+Reemplaza sobre V5.4/V5.5:
+- `app.py`
+- `src/conversation.py`
+
+Agrega:
+- `src/context_flow.py`
+- `src/gemini_context_patch.py`
+
+Cambios:
+- Gemini participa exactamente una vez en la etapa de contexto para comprender lenguaje coloquial y hacer una pregunta personalizada.
+- No se usa la confirmación mecánica “¿Representa lo que quisiste expresar?”.
+- Después de una respuesta de profundización, el chat avanza a frecuencia.
+- Si una frase no coincide con el diccionario, pero Gemini la entiende, se crea una propuesta `pending` usando la frase anonimizada, aunque `expresion_nueva` venga vacía.
+- Las propuestas siguen requiriendo aprobación humana.
