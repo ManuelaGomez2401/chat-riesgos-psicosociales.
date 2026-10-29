@@ -1,9 +1,12 @@
-# Escucha Laboral V5 académica
-Incluye chat, Supabase, guardado anonimizado, Gemini opcional, propuestas de aprendizaje y panel separado de revisión.
+# Conversemos - V5.2 académica
 
-## Despliegues
-1. Chat público: `app.py`.
-2. Panel privado: `review_app.py` como segunda app de Streamlit, protegido por `REVIEW_PASSWORD`.
+Incluye:
+- Cabecera que explica qué es el chat.
+- Consentimientos explicados.
+- Límites de Gemini: 3 llamadas por sesión y 100 en 30 días.
+- Registro del consumo en `gemini_usage`.
+- Módulo visible pero protegido para aprobar o rechazar expresiones.
+- Las propuestas permanecen `pending` hasta aprobación.
 
-## Configuración
-Ejecutar `supabase/schema.sql` y configurar todos los valores de `.streamlit/secrets.toml.example` en Streamlit Secrets.
+## SQL adicional
+Después de los scripts anteriores, ejecutar `supabase/patch_v52.sql`.

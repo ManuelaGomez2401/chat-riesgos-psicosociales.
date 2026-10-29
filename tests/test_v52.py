@@ -1,0 +1,7 @@
+from src.ai_budget import MAX_CALLS_PER_SESSION,MAX_CALLS_PER_MONTH,MAX_INPUT_CHARS,MAX_OUTPUT_TOKENS
+
+def test_limits():
+    assert MAX_CALLS_PER_SESSION==3
+    assert MAX_CALLS_PER_MONTH==100
+    assert MAX_INPUT_CHARS<=2500
+    assert MAX_OUTPUT_TOKENS<=180
