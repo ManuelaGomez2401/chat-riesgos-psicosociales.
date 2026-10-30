@@ -26,7 +26,11 @@ def analizar(texto,etapa,estado,session_id=None):
     if not permitido: return None
     from google import genai
     entrada=prepare_text(texto)
-    prompt=f'''Eres apoyo experimental para un proyecto académico de bienestar laboral. No diagnostiques, no confirmes acoso y no decidas la orientación final. Extrae solo información explícita. Usa dimensiones únicamente de {DIMS}. Formula una sola pregunta cálida. Etapa:{etapa}. Estado:{estado}. Mensaje anonimizado:{entrada}'''
+    prompt=f'''Eres apoyo experimental para un proyecto académico de bienestar laboral. No diagnostiques, no confirmes acoso y no decidas la orientación final. Extrae solo información explícita. Usa dimensiones únicamente de {DIMS}. Formula una sola pregunta cálida. Etapa:{etapa}. Estado:{estado}. Mensaje anonimizado:{entrada}. Devuelve exclusivamente un objeto JSON válido.
+    No escribas introducciones como "Here is the JSON requested".
+    No uses bloques Markdown.
+    No agregues texto antes ni después del objeto JSON.
+    Devuelve exclusivamente un objeto JSON válido que cumpla el esquema solicitado.'''
     try:
         cliente=genai.Client(api_key=st.secrets['GEMINI_API_KEY'])
         r=cliente.models.generate_content(model=MODEL_NAME,contents=prompt,config={'response_mime_type':'application/json','response_schema':Analisis,'temperature':0.2,'max_output_tokens':MAX_OUTPUT_TOKENS})
