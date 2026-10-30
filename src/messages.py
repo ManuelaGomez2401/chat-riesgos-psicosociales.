@@ -47,3 +47,23 @@ INFORMACION_INSUFICIENTE="""**Gracias por compartir hasta donde te sentiste cóm
 Con la información disponible no es posible comprender suficientemente la situación ni relacionarla con una condición específica del entorno laboral.
 
 Puedes volver a este espacio en otro momento y retomar la conversación con tus propias palabras. **Tu experiencia es importante, incluso cuando todavía no es fácil explicarla. 🌿**"""
+
+BIENESTAR_POSITIVO = """
+**Me alegra saber que te has sentido bien. 🌿**
+
+Con la información que compartiste, no identificamos una situación
+laboral desfavorable ni efectos negativos en tu bienestar.
+
+Reconocer cuando las cosas están funcionando adecuadamente también
+es una forma de cuidar tu bienestar.
+
+Puedes volver a este espacio cuando quieras conversar, revisar una
+situación nueva o expresar cualquier cambio en cómo te sientes.
+
+**Gracias por compartir este momento conmigo. 💚**"""
+
+PREGUNTA_BIENESTAR = """
+Me alegra saber que te sientes bien. 🌿
+
+¿Hay algún aspecto de tu trabajo que esté contribuyendo positivamente
+a que te sientas así, o existe alguna situación laboral que quieras revisar?"""
