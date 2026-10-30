@@ -35,5 +35,11 @@ def analizar(texto,etapa,estado,session_id=None):
         register_usage(session_id,etapa,prompt,r.text,True)
         return a
     except Exception as exc:
+        print(
+        "ERROR_GEMINI:",
+        type(exc).__name__,
+        str(exc),
+        flush=True
+        )
         register_usage(session_id,etapa,prompt,str(exc),False)
         return None
