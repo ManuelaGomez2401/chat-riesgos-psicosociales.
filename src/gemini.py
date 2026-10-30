@@ -30,7 +30,28 @@ def analizar(texto,etapa,estado,session_id=None):
     try:
         cliente=genai.Client(api_key=st.secrets['GEMINI_API_KEY'])
         r=cliente.models.generate_content(model=MODEL_NAME,contents=prompt,config={'response_mime_type':'application/json','response_schema':Analisis,'temperature':0.2,'max_output_tokens':MAX_OUTPUT_TOKENS})
-        a=r.parsed if getattr(r,'parsed',None) else Analisis.model_validate_json(r.text)
+        if getattr(r, "parsed", None):
+            a = r.parsed
+        else:
+            texto_respuesta = (r.text or "").strip()
+            # Retirar bloques Markdown si Gemini los agregó.
+            texto_respuesta = texto_respuesta.replace("```json", "")
+            texto_respuesta = texto_respuesta.replace("```JSON", "")
+            texto_respuesta = texto_respuesta.replace("```", "")
+            texto_respuesta = texto_respuesta.strip()
+
+            # Extraer únicamente el objeto JSON.
+            inicio_json = texto_respuesta.find("{")
+            fin_json = texto_respuesta.rfind("}")
+
+            if inicio_json == -1 or fin_json == -1 or fin_json < inicio_json:
+                raise ValueError(
+                    "Gemini respondió, pero no devolvió un objeto JSON reconocible. "
+                    f"Respuesta recibida: {texto_respuesta[:300]}"
+                )
+
+            json_limpio = texto_respuesta[inicio_json:fin_json + 1]
+            a = Analisis.model_validate_json(json_limpio)
         a.dimensiones=[d for d in a.dimensiones if d in DIMS][:3]
         register_usage(session_id,etapa,prompt,r.text,True)
         return a
