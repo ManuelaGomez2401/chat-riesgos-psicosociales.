@@ -57,70 +57,78 @@ def impactos(x):
  mp={'Descanso':['dormir','sueño','descanso','insomnio'],'Concentración':['concentracion','concentrarme'],'Motivación':['motivacion','sin ganas'],'Relaciones':['compañeros','equipo','conflictos'],'Vida personal':['familia','pareja','casa'],'Tareas':['tareas','entregas','errores','rendimiento']}
  return[k for k,v in mp.items() if any(z in t for z in v)]
 
-EXPRESIONES_BIENESTAR = [
- "me siento bien",
- "estoy bien",
- "me siento tranquilo",
- "me siento tranquila",
- "estoy tranquilo",
- "estoy tranquila",
- "me siento feliz",
- "me siento contento",
- "me siento contenta",
- "me gusta mi trabajo",
- "todo esta bien",
- "las cosas van bien",
- "me siento apoyado",
- "me siento apoyada",
- "me siento valorado",
- "me siento valorada",
-]
-
-EXPRESIONES_DESFAVORABLES = [
- "pero",
- "aunque",
- "sin embargo",
- "me grita",
- "me humilla",
- "me persigue",
- "me hostiga",
- "me acosa",
- "me amenaza",
- "me sobre exige",
- "me sobreexige",
- "demasiado trabajo",
- "muchas tareas",
- "no doy abasto",
- "no me escuchan",
- "no me apoyan",
- "no me valoran",
- "horarios largos",
- "trabajo muchas horas",
- "no puedo desconectarme",
- "me van a echar",
- "mal ambiente",
-]
-print(
-    "REGLAS_BIENESTAR_CARGADAS:",
-    len(EXPRESIONES_BIENESTAR),
-    len(EXPRESIONES_DESFAVORABLES),
-    flush=True,
-)
-
-
 def detectar_bienestar_positivo(texto):
     texto_normalizado = norm(texto)
 
+    expresiones_bienestar = (
+        "me siento bien",
+        "estoy bien",
+        "me siento tranquilo",
+        "me siento tranquila",
+        "estoy tranquilo",
+        "estoy tranquila",
+        "me siento feliz",
+        "estoy feliz",
+        "me siento contento",
+        "me siento contenta",
+        "estoy contento",
+        "estoy contenta",
+        "me gusta mi trabajo",
+        "todo esta bien",
+        "las cosas van bien",
+        "me siento apoyado",
+        "me siento apoyada",
+        "me siento valorado",
+        "me siento valorada",
+        "estoy a gusto",
+        "me siento a gusto",
+    )
+
     return any(
         expresion in texto_normalizado
-        for expresion in EXPRESIONES_BIENESTAR
+        for expresion in expresiones_bienestar
     )
 
 
 def detectar_condicion_desfavorable(texto):
     texto_normalizado = norm(texto)
 
+    expresiones_desfavorables = (
+        "pero",
+        "aunque",
+        "sin embargo",
+        "me grita",
+        "me humilla",
+        "me persigue",
+        "me hostiga",
+        "me acosa",
+        "me amenaza",
+        "me trata mal",
+        "me ignora",
+        "me excluye",
+        "me sobre exige",
+        "me sobreexige",
+        "me exige demasiado",
+        "demasiado trabajo",
+        "mucho trabajo",
+        "muchas tareas",
+        "demasiadas tareas",
+        "no doy abasto",
+        "no me escuchan",
+        "no me apoyan",
+        "no me valoran",
+        "horarios largos",
+        "jornadas largas",
+        "trabajo muchas horas",
+        "no puedo desconectarme",
+        "me van a echar",
+        "mal ambiente",
+        "me tiene en la mala",
+        "me tienen en la mala",
+        "me la tiene montada",
+    )
+
     return any(
         expresion in texto_normalizado
-        for expresion in EXPRESIONES_DESFAVORABLES
+        for expresion in expresiones_desfavorables
     )
