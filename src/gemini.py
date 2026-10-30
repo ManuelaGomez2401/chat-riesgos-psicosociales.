@@ -33,7 +33,16 @@ def analizar(texto,etapa,estado,session_id=None):
     Devuelve exclusivamente un objeto JSON válido que cumpla el esquema solicitado.'''
     try:
         cliente=genai.Client(api_key=st.secrets['GEMINI_API_KEY'])
-       r = cliente.models.generate_content(model=MODEL_NAME, contents=prompt, config={"response_mime_type": "application/json","response_json_schema": Analisis.model_json_schema(),"temperature": 0.2,"max_output_tokens": 400,})
+       r = cliente.models.generate_content(
+           model=MODEL_NAME,
+           contents=prompt,
+           config={
+               "response_mime_type": "application/json",
+               "response_json_schema": Analisis.model_json_schema(),
+               "temperature": 0.2,
+               "max_output_tokens": 400,
+           }
+       )
         if getattr(r, "parsed", None):
             a = r.parsed
         else:
