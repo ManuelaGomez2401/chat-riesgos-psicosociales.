@@ -6,7 +6,7 @@ MAX_CALLS_PER_SESSION = 3
 MAX_CALLS_PER_MONTH = 100
 MAX_INPUT_CHARS = 2500
 MAX_OUTPUT_TOKENS = 180
-MODEL_NAME = "gemini-2.5-flash"
+MODEL_NAME = "gemini-3.8-flash"
 
 
 def _session_calls():
