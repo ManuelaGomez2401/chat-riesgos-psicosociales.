@@ -47,7 +47,7 @@ def analizar(texto,etapa,estado,session_id=None):
             if isinstance(r.pased,dict):
                 a = Analisis.model_validate(r.parsed)
             else:
-            a = r.parsed
+                a = r.parsed
         else:
             texto_respuesta = (r.text or "").strip()
             # Retirar bloques Markdown si Gemini los agregó.
