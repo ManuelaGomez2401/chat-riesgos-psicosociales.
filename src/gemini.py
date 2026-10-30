@@ -39,8 +39,8 @@ def analizar(texto,etapa,estado,session_id=None):
             config={
                 "response_mime_type": "application/json",
                 "response_json_schema": Analisis.model_json_schema(),
-                "temperature": 0.2,
-                "max_output_tokens": 400,
+                "temperature": 0.0,
+                "max_output_tokens": 1200,
             },
         )
         if getattr(r, "parsed", None):
