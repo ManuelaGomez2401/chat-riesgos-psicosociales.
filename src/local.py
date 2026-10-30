@@ -56,7 +56,7 @@ def impactos(x):
  if any(z in t for z in ['no me afecta','ninguno','estoy bien','me siento bien']):return[]
  mp={'Descanso':['dormir','sueño','descanso','insomnio'],'Concentración':['concentracion','concentrarme'],'Motivación':['motivacion','sin ganas'],'Relaciones':['compañeros','equipo','conflictos'],'Vida personal':['familia','pareja','casa'],'Tareas':['tareas','entregas','errores','rendimiento']}
  return[k for k,v in mp.items() if any(z in t for z in v)]
- 
+
  EXPRESIONES_BIENESTAR = [
     "me siento bien",
     "estoy bien",
@@ -100,6 +100,12 @@ EXPRESIONES_DESFAVORABLES = [
     "me van a echar",
     "mal ambiente",
 ]
+print(
+    "REGLAS_BIENESTAR_CARGADAS:",
+    len(EXPRESIONES_BIENESTAR),
+    len(EXPRESIONES_DESFAVORABLES),
+    flush=True,
+)
 
 
 def detectar_bienestar_positivo(texto):
