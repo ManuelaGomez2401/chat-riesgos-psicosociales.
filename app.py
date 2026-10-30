@@ -4,9 +4,86 @@ import streamlit as st
 from src.anonymizer import anonimizar
 from src.ai_budget import MAX_CALLS_PER_SESSION, can_call
 from src.gemini import disponible as ia_disponible, analizar
-from src.local import norm, relacion, detectar, frecuencia, duracion, impactos, detectar_bienestar_positivo, detectar_condicion_desfavorable
+from src.local import norm, relacion, detectar, frecuencia, duracion, impactos
 
 # Funciones integradas en app.py para evitar errores de módulos faltantes en GitHub.
+EXPRESIONES_BIENESTAR = [
+    "me siento bien",
+    "estoy bien",
+    "me siento tranquilo",
+    "me siento tranquila",
+    "estoy tranquilo",
+    "estoy tranquila",
+    "me siento feliz",
+    "estoy feliz",
+    "me siento contento",
+    "me siento contenta",
+    "estoy contento",
+    "estoy contenta",
+    "me gusta mi trabajo",
+    "todo esta bien",
+    "las cosas van bien",
+    "me siento apoyado",
+    "me siento apoyada",
+    "me siento valorado",
+    "me siento valorada",
+    "estoy a gusto",
+    "me siento a gusto",
+]
+
+
+EXPRESIONES_DESFAVORABLES = [
+    "pero",
+    "aunque",
+    "sin embargo",
+    "me grita",
+    "me humilla",
+    "me persigue",
+    "me hostiga",
+    "me acosa",
+    "me amenaza",
+    "me trata mal",
+    "me ignora",
+    "me excluye",
+    "me sobre exige",
+    "me sobreexige",
+    "me exige demasiado",
+    "demasiado trabajo",
+    "mucho trabajo",
+    "muchas tareas",
+    "demasiadas tareas",
+    "no doy abasto",
+    "no me escuchan",
+    "no me apoyan",
+    "no me valoran",
+    "horarios largos",
+    "jornadas largas",
+    "trabajo muchas horas",
+    "no puedo desconectarme",
+    "me van a echar",
+    "mal ambiente",
+    "me tiene en la mala",
+    "me tienen en la mala",
+    "me la tiene montada",
+]
+
+
+def detectar_bienestar_positivo(texto):
+    texto_normalizado = norm(texto)
+
+    return any(
+        expresion in texto_normalizado
+        for expresion in EXPRESIONES_BIENESTAR
+    )
+
+
+def detectar_condicion_desfavorable(texto):
+    texto_normalizado = norm(texto)
+
+    return any(
+        expresion in texto_normalizado
+        for expresion in EXPRESIONES_DESFAVORABLES
+    )
 def interpretar_relacion_local(texto): return relacion(texto)
 def analizar_contexto_local(texto, diccionario): return detectar(texto, diccionario)
 def interpretar_frecuencia_local(texto): return frecuencia(texto)
