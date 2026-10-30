@@ -4,7 +4,7 @@ import streamlit as st
 from src.anonymizer import anonimizar
 from src.ai_budget import MAX_CALLS_PER_SESSION, can_call
 from src.gemini import disponible as ia_disponible, analizar
-from src.local import norm, relacion, detectar, frecuencia, duracion, impactos
+from src.local import norm, relacion, detectar, frecuencia, duracion, impactos, detectar_bienestar_positivo, detectar_condicion_desfavorable
 
 # Funciones integradas en app.py para evitar errores de módulos faltantes en GitHub.
 def interpretar_relacion_local(texto): return relacion(texto)
@@ -30,7 +30,7 @@ def expresion_para_propuesta(texto_anonimo, ia, hubo_coincidencia_local):
     expresion=(ia.expresion_nueva or texto_anonimo).strip()
     return expresion[:220] if len(expresion)>=4 else None
 CONTEXT_OBJECTIVE="""Analiza el relato laboral completo. Identifica hasta tres dimensiones permitidas sin diagnosticar ni confirmar acoso. Redacta UNA sola pregunta de profundización que use detalles del mensaje. No preguntes '¿representa lo que quisiste expresar?'. Si la frase es nueva o coloquial, devuelve en expresion_nueva una versión breve y reutilizable."""
-from src.messages import BIENVENIDA, SIN_INDICADORES, ACOMPANAMIENTO_GENERAL, ACOMPANAMIENTO_RELACIONES, INFORMACION_INSUFICIENTE
+from src.messages import BIENVENIDA, SIN_INDICADORES, ACOMPANAMIENTO_GENERAL, ACOMPANAMIENTO_RELACIONES, INFORMACION_INSUFICIENTE, BIENESTAR_POSITIVO, PREGUNTA_BIENESTAR
 from src.orientation import calcular
 from src.safety import detectar_prioridad, PRIORIDAD
 from src.emotional_support import detectar_conceptos, ayudas_para, formatear_ayuda
@@ -59,7 +59,7 @@ def add(role,text,used_ai=False):
         except Exception as exc:st.session_state.storage_error=str(exc)
 
 def init():
-    defaults={'etapa':'relato','msg':[],'dims':[],'frec':None,'dur':None,'imps':[],'db_session':None,'prioridad':False,'gemini_calls':0,'storage_error':None,'context_attempts':0,'gemini_budget_error':None,'consentimientos_confirmados':False,'contexto_ia_realizado':False,'contexto_profundizado':False,'emociones_detectadas':[]}
+    defaults={'etapa':'relato','msg':[],'dims':[],'frec':None,'dur':None,'imps':[],'db_session':None,'prioridad':False,'gemini_calls':0,'storage_error':None,'context_attempts':0,'gemini_budget_error':None,'consentimientos_confirmados':False,'contexto_ia_realizado':False,'contexto_profundizado':False,'emociones_detectadas':[],'hay_condicion_desfavorable':False}
     for k,v in defaults.items():
         if k not in st.session_state:st.session_state[k]=v
     if not st.session_state.msg:add('assistant',BIENVENIDA)
@@ -124,14 +124,94 @@ if x:
     nuevos=detectar_conceptos(x)
     st.session_state.emociones_detectadas=list(dict.fromkeys(st.session_state.emociones_detectadas+nuevos))
     e=st.session_state.etapa;anon=anonimizar(x)
-    if e=='relato':
-        add('assistant','Gracias por contármelo. ¿Se relaciona con el trabajo, con algo personal, con ambas cosas o aún no lo tienes claro?');st.session_state.etapa='relacion'
-    elif e=='relacion':
-        r=interpretar_relacion_local(x);ia=None
-        if r is None and ia_disponible() and st.session_state.autoriza_ia:ia=analizar(anon,e,{'objetivo':'relación'},st.session_state.db_session);r=ia.relacion if ia else None
-        if r=='personal':add('assistant','Gracias por compartirlo. Con lo conversado no identificamos elementos suficientes para relacionarlo con factores laborales. Puedes buscar apoyo adecuado para otros aspectos de tu vida. 💚',bool(ia));st.session_state.etapa='fin'
-        elif r=='incierta':add('assistant','Está bien no tenerlo claro. ¿Qué estaba ocurriendo justo antes y en qué contexto suele suceder?',bool(ia));st.session_state.etapa='contexto'
-        else:add('assistant','¿Qué situación concreta del trabajo está influyendo?',bool(ia));st.session_state.etapa='contexto'
+    if e == "relato":
+        bienestar_positivo = detectar_bienestar_positivo(x)
+        condicion_desfavorable = detectar_condicion_desfavorable(x)
+        st.session_state.hay_condicion_desfavorable = condicion_desfavorable
+
+        if bienestar_positivo and not condicion_desfavorable:
+            add("assistant", PREGUNTA_BIENESTAR)
+            st.session_state.etapa = "bienestar_contexto"
+        else:
+            add(
+                "assistant",
+                "Gracias por contármelo. ¿Se relaciona con el trabajo, "
+                "con algo personal, con ambas cosas o aún no lo tienes claro?",
+            )
+            st.session_state.etapa = "relacion"
+
+    elif e == "bienestar_contexto":
+        condicion_desfavorable = detectar_condicion_desfavorable(x)
+        st.session_state.hay_condicion_desfavorable = condicion_desfavorable
+
+        if condicion_desfavorable:
+            add(
+                "assistant",
+                "Gracias por aclararlo. Aunque en general te sientes bien, "
+                "mencionaste una situación laboral que podría ser importante "
+                "explorar. ¿Qué está ocurriendo concretamente?",
+            )
+            st.session_state.etapa = "contexto"
+        else:
+            add("assistant", BIENESTAR_POSITIVO)
+            st.session_state.etapa = "fin"
+
+    elif e == "relacion":
+        r = interpretar_relacion_local(x)
+        ia = None
+
+        if r is None and ia_disponible() and st.session_state.autoriza_ia:
+            ia = analizar(
+                anon,
+                e,
+                {
+                    "objetivo": (
+                        "Identificar si la persona relaciona la situación con "
+                        "el trabajo, con algo personal, con ambas cosas o si "
+                        "todavía no lo tiene claro."
+                    )
+                },
+                st.session_state.db_session,
+            )
+            r = ia.relacion if ia else None
+
+        if r == "personal":
+            add(
+                "assistant",
+                "Gracias por compartirlo. Con la información conversada no "
+                "identificamos elementos suficientes para relacionar la situación "
+                "con factores del entorno laboral. Si necesitas apoyo con otros "
+                "aspectos de tu vida, puedes considerar un servicio de orientación "
+                "adecuado. 💚",
+                bool(ia),
+            )
+            st.session_state.etapa = "fin"
+        elif r == "incierta":
+            add(
+                "assistant",
+                "Está bien no tenerlo claro todavía. ¿Qué estaba ocurriendo "
+                "justo antes de sentirte así y en qué contexto suele suceder?",
+                bool(ia),
+            )
+            st.session_state.etapa = "contexto"
+        elif r in ["trabajo", "ambas"]:
+            st.session_state.hay_condicion_desfavorable = True
+            add(
+                "assistant",
+                "¿Qué situación concreta del trabajo está influyendo? Puedes "
+                "describir tareas, horarios, trato, cambios o relaciones, sin "
+                "incluir nombres.",
+                bool(ia),
+            )
+            st.session_state.etapa = "contexto"
+        else:
+            add(
+                "assistant",
+                "No logré comprender completamente la respuesta. Puedes decirme "
+                "si se relaciona con el trabajo, con algo personal, con ambas "
+                "cosas o si todavía no lo tienes claro.",
+                bool(ia),
+            )
     elif e=='contexto':
         # En contexto, Gemini sí aporta valor: interpreta lenguaje coloquial y redacta
         # una pregunta específica. Solo se usa una vez para no gastar las 3 llamadas.
@@ -208,14 +288,31 @@ if x:
     elif e=='impacto':
         v=interpretar_impactos_local(x);ia=None
         if not v and not any(z in norm(x) for z in ['no me afecta','ninguno','estoy bien','me siento bien']) and ia_disponible() and st.session_state.autoriza_ia:ia=analizar(anon,e,{'objetivo':'impactos explícitos'},st.session_state.db_session);v=ia.impactos if ia else []
-        st.session_state.imps=v;r=calcular(st.session_state.frec,st.session_state.dur,v)
-        if r['tipo']=='sin_indicadores':msg=SIN_INDICADORES
-        elif not st.session_state.dims:msg=INFORMACION_INSUFICIENTE
-        elif any(d in st.session_state.dims for d in ['relaciones y liderazgo','relaciones laborales']):msg=ACOMPANAMIENTO_RELACIONES
-        else:msg=ACOMPANAMIENTO_GENERAL
-        add('assistant',msg,bool(ia))
-        for ayuda in ayudas_para(st.session_state.emociones_detectadas,maximo=2):add('assistant',formatear_ayuda(ayuda))
-        st.session_state.etapa='fin'
+        st.session_state.imps = v
+        r = calcular(
+            st.session_state.frec,
+            st.session_state.dur,
+            v,
+            hay_condicion_desfavorable=(
+                st.session_state.hay_condicion_desfavorable
+                or bool(st.session_state.dims)
+            ),
+        )
+        if r["tipo"] == "bienestar_positivo":
+            msg = BIENESTAR_POSITIVO
+        elif r["tipo"] == "sin_indicadores":
+            msg = SIN_INDICADORES
+        elif not st.session_state.dims:
+            msg = INFORMACION_INSUFICIENTE
+        elif any(d in st.session_state.dims for d in ["relaciones y liderazgo", "relaciones laborales"]):
+            msg = ACOMPANAMIENTO_RELACIONES
+        else:
+            msg = ACOMPANAMIENTO_GENERAL
+        add("assistant", msg, bool(ia))
+        if r["tipo"] != "bienestar_positivo":
+            for ayuda in ayudas_para(st.session_state.emociones_detectadas, maximo=2):
+                add("assistant", formatear_ayuda(ayuda))
+        st.session_state.etapa = "fin"
         if st.session_state.db_session:
             try:guardar_resultado({'session_id':st.session_state.db_session,'relationship':'laboral','dimensions':st.session_state.dims,'frequency':st.session_state.frec,'duration':st.session_state.dur,'impacts':v,'orientation':r['tipo'],'rule_version':r['version']})
             except Exception as exc:st.session_state.storage_error=str(exc)
