@@ -1,16 +1,17 @@
-# Parche V5.6: conversación contextual con Gemini
+# Conversemos V6 integrada
 
-Reemplaza sobre V5.4/V5.5:
-- `app.py`
-- `src/conversation.py`
+## Incluye
+- Gemini entra directamente en la etapa `contexto` después de que la persona indica relación laboral/mixta/incierta y describe la situación. Clasifica solo en dimensiones permitidas y formula una pregunta natural; no vuelve a preguntar si la situación es laboral.
+- El protocolo prioritario no pide reiniciar. Mantiene botones `tel:106` y `tel:123`, que abren el marcador sin realizar la llamada automáticamente.
+- Asistencia emocional local, sin Gemini, basada en `data/diccionario_bienestar_psicologico_con_asistencia.xlsx`.
+- El final desactiva la caja de entrada, por lo que no entra en bucle.
+- `review_app.py` funciona como aplicación privada separada para aprobar/rechazar expresiones con la clave privada de Supabase.
+- Propuestas nuevas quedan `pending`; no se incorporan al diccionario hasta aprobación.
 
-Agrega:
-- `src/context_flow.py`
-- `src/gemini_context_patch.py`
+## Despliegue
+- App pública: `app.py`
+- App privada de revisión: `review_app.py`
+- Secrets requeridos: `GEMINI_API_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `REVIEW_PASSWORD`.
 
-Cambios:
-- Gemini participa exactamente una vez en la etapa de contexto para comprender lenguaje coloquial y hacer una pregunta personalizada.
-- No se usa la confirmación mecánica “¿Representa lo que quisiste expresar?”.
-- Después de una respuesta de profundización, el chat avanza a frecuencia.
-- Si una frase no coincide con el diccionario, pero Gemini la entiende, se crea una propuesta `pending` usando la frase anonimizada, aunque `expresion_nueva` venga vacía.
-- Las propuestas siguen requiriendo aprobación humana.
+## Nota de seguridad
+La Línea 106 ofrece orientación en salud mental; ante peligro inmediato debe usarse el 123 o urgencias. El proyecto es académico y no diagnostica.

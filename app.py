@@ -33,9 +33,11 @@ CONTEXT_OBJECTIVE="""Analiza el relato laboral completo. Identifica hasta tres d
 from src.messages import BIENVENIDA, SIN_INDICADORES, ACOMPANAMIENTO_GENERAL, ACOMPANAMIENTO_RELACIONES, INFORMACION_INSUFICIENTE
 from src.orientation import calcular
 from src.safety import detectar_prioridad, PRIORIDAD
-from src.storage import configurado, crear_sesion, guardar_mensaje, guardar_resultado, crear_propuesta, diccionario_activo, propuestas_pendientes, aprobar_propuesta, rechazar_propuesta
+from src.emotional_support import detectar_conceptos, ayudas_para, formatear_ayuda
+from src.emergency_ui import mostrar_botones_emergencia
+from src.storage import configurado, crear_sesion, guardar_mensaje, guardar_resultado, crear_propuesta_supervisada, diccionario_activo, propuestas_pendientes, aprobar_propuesta, rechazar_propuesta
 
-DOG='assets/perrito.png'; HUMAN='assets/persona.png'; VERSION='5.5-flujo-natural'
+DOG='assets/perrito.png'; HUMAN='assets/persona.png'; VERSION='6.0-integrada'
 st.set_page_config(page_title='Conversemos',page_icon='🐾',layout='centered')
 st.markdown(r'''<style>:root{--p:#527A61;--s:#EAF3EC;--d:#294B3E;--b:#CFE0D4;--w:#FFFDF9;--m:#73867C}.stApp{background:linear-gradient(180deg,#DDECE1,#F7FAF8 260px)}.block-container{max-width:900px;padding-top:1rem;padding-bottom:7rem}.hero{background:linear-gradient(135deg,#466B54,#8EAF98);color:white;border-radius:24px;padding:22px;margin-bottom:14px}.hero h1{color:white;margin:0;font-size:1.8rem}.hero p{margin:.35rem 0 0;line-height:1.5}.hero-row{display:flex;align-items:center;gap:16px}.hero img{width:68px;height:68px;border-radius:50%;border:3px solid white;object-fit:cover}.info-card{background:#FFFDF9;border:1px solid var(--b);border-radius:16px;padding:14px 16px;margin:10px 0;color:var(--d)}.consent-note{color:var(--m);font-size:.86rem;margin:-4px 0 10px 38px;line-height:1.4}[data-testid=stChatMessage]{background:var(--w);border:1px solid var(--b);border-radius:20px;padding:12px 15px}[data-testid=stChatMessage]:has([data-testid=chatAvatarIcon-user]){background:var(--s);margin-left:8%}.status{background:var(--s);color:var(--p);border-radius:999px;padding:5px 10px;font-size:.78rem;display:inline-block}@media(max-width:640px){.hero{padding:16px}.hero h1{font-size:1.4rem}.hero img{width:54px;height:54px}[data-testid=stChatMessage]{margin-left:0!important}}</style>''',unsafe_allow_html=True)
 b64=base64.b64encode(open(DOG,'rb').read()).decode()
@@ -57,7 +59,7 @@ def add(role,text,used_ai=False):
         except Exception as exc:st.session_state.storage_error=str(exc)
 
 def init():
-    defaults={'etapa':'relato','msg':[],'dims':[],'frec':None,'dur':None,'imps':[],'db_session':None,'prioridad':False,'gemini_calls':0,'storage_error':None,'context_attempts':0,'gemini_budget_error':None,'consentimientos_confirmados':False,'contexto_ia_realizado':False,'contexto_profundizado':False}
+    defaults={'etapa':'relato','msg':[],'dims':[],'frec':None,'dur':None,'imps':[],'db_session':None,'prioridad':False,'gemini_calls':0,'storage_error':None,'context_attempts':0,'gemini_budget_error':None,'consentimientos_confirmados':False,'contexto_ia_realizado':False,'contexto_profundizado':False,'emociones_detectadas':[]}
     for k,v in defaults.items():
         if k not in st.session_state:st.session_state[k]=v
     if not st.session_state.msg:add('assistant',BIENVENIDA)
@@ -106,10 +108,21 @@ with c2:st.button('Reiniciar',on_click=reset)
 for m in st.session_state.msg:
     with st.chat_message(m['role'],avatar=DOG if m['role']=='assistant' else HUMAN):st.write(m['content'])
 
-x=st.chat_input('Cuéntame con tus propias palabras...')
+if st.session_state.etapa=='prioridad':
+    st.error('Si existe peligro inmediato o una acción en curso, abre emergencias 123. Para orientación en salud mental, abre la Línea 106.')
+    mostrar_botones_emergencia()
+    st.info('Busca compañía de una persona de confianza y evita quedarte a solas mientras recibes apoyo, si hacerlo es seguro.')
+if st.session_state.etapa=='fin':
+    st.success('La conversación ha finalizado. La orientación queda visible; no necesitas reiniciar para leerla.')
+x=None if st.session_state.etapa=='fin' else st.chat_input('Cuéntame con tus propias palabras...')
 if x:
     add('user',x)
-    if detectar_prioridad(x):st.session_state.prioridad=True;add('assistant',PRIORIDAD);st.session_state.etapa='prioridad';st.rerun()
+    if detectar_prioridad(x):
+        st.session_state.prioridad=True
+        add('assistant',PRIORIDAD+'\n\nNo necesitas reiniciar. Los botones de llamada permanecerán disponibles debajo de la conversación.')
+        st.session_state.etapa='prioridad';st.rerun()
+    nuevos=detectar_conceptos(x)
+    st.session_state.emociones_detectadas=list(dict.fromkeys(st.session_state.emociones_detectadas+nuevos))
     e=st.session_state.etapa;anon=anonimizar(x)
     if e=='relato':
         add('assistant','Gracias por contármelo. ¿Se relaciona con el trabajo, con algo personal, con ambas cosas o aún no lo tienes claro?');st.session_state.etapa='relacion'
@@ -142,7 +155,7 @@ if x:
         propuesta=expresion_para_propuesta(anon,ia,bool(loc))
         if st.session_state.autoriza_aprendizaje and propuesta and st.session_state.db_session:
             try:
-                crear_propuesta({
+                crear_propuesta_supervisada({
                     'session_id':st.session_state.db_session,
                     'expression':propuesta,
                     'dimensions':dims_ia,
@@ -200,10 +213,12 @@ if x:
         elif not st.session_state.dims:msg=INFORMACION_INSUFICIENTE
         elif any(d in st.session_state.dims for d in ['relaciones y liderazgo','relaciones laborales']):msg=ACOMPANAMIENTO_RELACIONES
         else:msg=ACOMPANAMIENTO_GENERAL
-        add('assistant',msg,bool(ia));st.session_state.etapa='fin'
+        add('assistant',msg,bool(ia))
+        for ayuda in ayudas_para(st.session_state.emociones_detectadas,maximo=2):add('assistant',formatear_ayuda(ayuda))
+        st.session_state.etapa='fin'
         if st.session_state.db_session:
             try:guardar_resultado({'session_id':st.session_state.db_session,'relationship':'laboral','dimensions':st.session_state.dims,'frequency':st.session_state.frec,'duration':st.session_state.dur,'impacts':v,'orientation':r['tipo'],'rule_version':r['version']})
             except Exception as exc:st.session_state.storage_error=str(exc)
-    elif e=='prioridad':add('assistant','Utiliza los canales indicados y busca compañía de una persona de confianza. La evaluación laboral se detiene en este momento.')
+    elif e=='prioridad':add('assistant','Los botones de Línea 106 y emergencias 123 permanecen disponibles. Si puedes, busca a una persona de confianza para que te acompañe mientras accedes a ayuda.')
     elif e=='fin':add('assistant','La conversación terminó. Puedes reiniciar cuando quieras.')
     st.rerun()

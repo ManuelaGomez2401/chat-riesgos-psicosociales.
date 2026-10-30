@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime, timezone
 import streamlit as st
 
 
@@ -87,3 +88,23 @@ def rechazar_propuesta(proposal_id, reviewer="equipo académico"):
     cliente(admin=True).table("dictionary_proposals").update(
         {"status": "rejected", "reviewed_by": reviewer}
     ).eq("id", proposal_id).execute()
+
+def listar_propuestas(status='pending'):
+    return cliente(admin=True).table('dictionary_proposals').select('*').eq('status',status).order('created_at',desc=False).execute().data
+
+def crear_propuesta_supervisada(payload):
+    """Evita duplicados pendientes. Usa clave privada solo en el servidor."""
+    if configurado(admin=True):
+        admin=cliente(admin=True)
+        existentes=admin.table('dictionary_proposals').select('id').eq('expression',payload['expression']).eq('status','pending').limit(1).execute().data
+        if existentes:return existentes[0]
+        return admin.table('dictionary_proposals').insert(payload).execute().data[0]
+    return crear_propuesta(payload)
+
+def aprobar_propuesta_completa(proposal_id, expression, variants, dimension, question, reviewer, notes=''):
+    admin=cliente(admin=True)
+    admin.table('dictionary_entries').upsert({'expression':expression.strip(),'variants':variants.strip(),'dimension':dimension.strip(),'question':question.strip(),'status':'active','source':'reviewed_chat','reviewed_by':reviewer.strip() or 'equipo académico','reviewed_at':datetime.now(timezone.utc).isoformat()},on_conflict='expression').execute()
+    admin.table('dictionary_proposals').update({'status':'approved','reviewed_by':reviewer.strip() or 'equipo académico','reviewed_at':datetime.now(timezone.utc).isoformat()}).eq('id',proposal_id).execute()
+
+def rechazar_propuesta_completa(proposal_id, reviewer):
+    cliente(admin=True).table('dictionary_proposals').update({'status':'rejected','reviewed_by':reviewer.strip() or 'equipo académico','reviewed_at':datetime.now(timezone.utc).isoformat()}).eq('id',proposal_id).execute()
