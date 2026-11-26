@@ -1,4 +1,4 @@
-BIENVENIDA="""BIENVENIDA = """
+BIENVENIDA="""
 **¡Hola! Soy Zia, el asistente conversacional de SENZIA. ✦**
 
 Este es un espacio para conversar sobre cómo te has sentido
@@ -20,7 +20,7 @@ que permita identificar a una persona o empresa.
 
 **Cuando estés preparado, cuéntame: ¿cómo te has sentido últimamente
 y qué ha estado ocurriendo?**
-""""""
+"""
 
 SIN_INDICADORES="""**Me alegra saber que, con la información compartida, no identificamos señales suficientes de una situación laboral que esté afectando tu bienestar. 🌿**
 
