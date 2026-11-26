@@ -1,14 +1,26 @@
-BIENVENIDA="""**¡Hola! Me alegra que estés aquí. 💚**
+BIENVENIDA="""BIENVENIDA = """
+**¡Hola! Soy Zia, el asistente conversacional de SENZIA. ✦**
 
-Este es un espacio académico para conversar sobre cómo te has sentido últimamente y sobre situaciones de tu entorno laboral.
+Este es un espacio para conversar sobre cómo te has sentido
+últimamente y sobre las situaciones que has vivido en tu
+entorno laboral.
 
-Puedes expresarte con tus propias palabras. No necesitas encontrar las palabras perfectas y podrás corregir cualquier interpretación.
+Puedes expresarte con tus propias palabras. No necesitas utilizar
+términos técnicos ni responder de una forma determinada.
+Avanzaremos paso a paso y podrás aclarar cualquier interpretación
+que no represente lo que quisiste decir.
 
-La herramienta no realiza diagnósticos, no confirma situaciones de acoso y no reemplaza a psicología, bienestar, Recursos Humanos o Seguridad y Salud en el Trabajo.
+SENZIA es un prototipo académico y preventivo. No realiza
+diagnósticos, no confirma situaciones de acoso y no sustituye
+la orientación de profesionales de psicología, bienestar,
+Seguridad y Salud en el Trabajo o Gestión Humana.
 
-Evita nombres, documentos, teléfonos, correos o datos de una empresa real.
+Evita escribir nombres, documentos, teléfonos, correos o información
+que permita identificar a una persona o empresa.
 
-**¿Cómo te has sentido últimamente y qué ha estado ocurriendo?**"""
+**Cuando estés preparado, cuéntame: ¿cómo te has sentido últimamente
+y qué ha estado ocurriendo?**
+""""""
 
 SIN_INDICADORES="""**Me alegra saber que, con la información compartida, no identificamos señales suficientes de una situación laboral que esté afectando tu bienestar. 🌿**
 
