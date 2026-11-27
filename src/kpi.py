@@ -31,6 +31,21 @@ def admin_kpis(start_date, end_date):
     return result.data or {}
 
 
+def demographic_kpis(start_date, end_date, age_range="Todos", gender="Todos"):
+    if current_role() not in {"reviewer", "admin"}:
+        raise PermissionError("No tienes permisos para consultar KPI demográficos.")
+    result = authenticated_client().rpc(
+        "get_demographic_kpis",
+        {
+            "p_start": _iso(start_date),
+            "p_end": _iso(end_date),
+            "p_age_range": None if age_range == "Todos" else age_range,
+            "p_gender": None if gender == "Todos" else gender,
+        },
+    ).execute()
+    return result.data or {}
+
+
 def my_sessions(limit=50):
     result = (
         authenticated_client()

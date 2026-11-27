@@ -16,13 +16,13 @@ def _secret_key():
 
 def client():
     if not _url() or not _publishable_key():
-        raise RuntimeError("Faltan SUPABASE_URL o SUPABASE_ANON_KEY en Streamlit Secrets.")
+        raise RuntimeError("Faltan SUPABASE_URL o SUPABASE_ANON_KEY en Secrets.")
     return create_client(_url(), _publishable_key())
 
 
 def admin_client():
     if not _url() or not _secret_key():
-        raise RuntimeError("Faltan SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY.")
+        raise RuntimeError("Falta SUPABASE_SERVICE_ROLE_KEY en Secrets.")
     return create_client(_url(), _secret_key())
 
 
@@ -70,7 +70,11 @@ def _set_session(auth_response):
     sb.postgrest.auth(session.access_token)
     profile_result = (
         sb.table("profiles")
-        .select("id, display_name, role, organization_code, active, created_at")
+        .select(
+            "id, display_name, role, organization_code, active, "
+            "birth_date, gender_identity, demographic_consent, "
+            "created_at, last_login_at"
+        )
         .eq("id", str(user.id))
         .single()
         .execute()
@@ -84,17 +88,33 @@ def _set_session(auth_response):
 
 
 def sign_in(email, password):
-    response = client().auth.sign_in_with_password({"email": email, "password": password})
+    response = client().auth.sign_in_with_password(
+        {"email": email, "password": password}
+    )
     _set_session(response)
     return current_profile()
 
 
-def sign_up(email, password, display_name):
+def sign_up(
+    email,
+    password,
+    display_name,
+    birth_date,
+    gender_identity,
+    demographic_consent,
+):
     response = client().auth.sign_up(
         {
             "email": email,
             "password": password,
-            "options": {"data": {"display_name": display_name}},
+            "options": {
+                "data": {
+                    "display_name": display_name,
+                    "birth_date": birth_date.isoformat(),
+                    "gender_identity": gender_identity,
+                    "demographic_consent": bool(demographic_consent),
+                }
+            },
         }
     )
     if response.session:
@@ -102,7 +122,7 @@ def sign_up(email, password, display_name):
         return {"confirmed": True, "message": "Cuenta creada e iniciada."}
     return {
         "confirmed": False,
-        "message": "Cuenta creada. Revisa tu correo para confirmar el registro antes de iniciar sesión.",
+        "message": "Cuenta creada. Revisa tu correo para confirmar el registro.",
     }
 
 
@@ -132,13 +152,23 @@ def authenticated_client():
     return sb
 
 
-def update_my_display_name(display_name):
-    sb = authenticated_client()
-    user_id = current_user_id()
+def update_my_profile(
+    display_name,
+    birth_date,
+    gender_identity,
+    demographic_consent,
+):
+    payload = {
+        "display_name": display_name,
+        "birth_date": birth_date.isoformat(),
+        "gender_identity": gender_identity,
+        "demographic_consent": bool(demographic_consent),
+    }
     result = (
-        sb.table("profiles")
-        .update({"display_name": display_name})
-        .eq("id", user_id)
+        authenticated_client()
+        .table("profiles")
+        .update(payload)
+        .eq("id", current_user_id())
         .execute()
     )
     if result.data:
@@ -152,7 +182,11 @@ def list_profiles_admin():
     return (
         admin_client()
         .table("profiles")
-        .select("id, display_name, role, organization_code, active, created_at, last_login_at")
+        .select(
+            "id, display_name, role, organization_code, active, "
+            "birth_date, gender_identity, demographic_consent, "
+            "created_at, last_login_at"
+        )
         .order("created_at", desc=True)
         .execute()
         .data
